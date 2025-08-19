@@ -7,9 +7,9 @@
 #include <string.h>
 #include <sys/stat.h>
 
-// --- Inclusões específicas da plataforma ---
+// --- Platform-specific includes ---
 #ifdef _WIN32
-#include <shlobj.h> // Para SHGetFolderPathA
+#include <shlobj.h> // For SHGetFolderPathA
 #include <windows.h>
 #else
 #include <dirent.h>
@@ -17,7 +17,7 @@
 #include <wordexp.h>
 #endif
 
-// --- Implementação para POSIX (Linux, macOS) ---
+// --- Implementation for POSIX (Linux, macOS) ---
 #ifndef _WIN32
 
 char *platform_get_config_dir(void) {
@@ -32,13 +32,14 @@ char *platform_get_config_dir(void) {
       base_path = strdup(exp_result.we_wordv[0]);
       wordfree(&exp_result);
     } else {
-      return NULL; // Falha ao expandir o caminho
+      return NULL; // Failed to expand the path
     }
   }
 
-  if (!base_path) return NULL;
+  if (!base_path)
+    return NULL;
 
-  char* ordo_path = path_join(base_path, "ordo");
+  char *ordo_path = path_join(base_path, "ordo");
   free(base_path);
 
   return ordo_path;
@@ -56,13 +57,14 @@ char *platform_get_data_dir(void) {
       base_path = strdup(exp_result.we_wordv[0]);
       wordfree(&exp_result);
     } else {
-      return NULL; // Falha ao expandir o caminho
+      return NULL; // Failed to expand the path
     }
   }
 
-  if (!base_path) return NULL;
+  if (!base_path)
+    return NULL;
 
-  char* ordo_path = path_join(base_path, "ordo");
+  char *ordo_path = path_join(base_path, "ordo");
   free(base_path);
 
   return ordo_path;
@@ -100,7 +102,7 @@ FileList platform_list_files_in_dir(const char *dir_path,
     return file_list;
   }
 
-  int capacity = 10; // Capacidade inicial
+  int capacity = 10; // Initial capacity
   file_list.files = malloc(capacity * sizeof(char *));
   if (!file_list.files) {
     closedir(dir);
@@ -111,7 +113,7 @@ FileList platform_list_files_in_dir(const char *dir_path,
   while ((entry = readdir(dir)) != NULL) {
     if (strstr(entry->d_name, extension)) {
       if (file_list.count >= capacity) {
-        capacity *= 2; // Dobra a capacidade
+        capacity *= 2; // Double the capacity
         char **new_files = realloc(file_list.files, capacity * sizeof(char *));
         if (!new_files) {
           platform_free_file_list(&file_list);
@@ -127,11 +129,11 @@ FileList platform_list_files_in_dir(const char *dir_path,
   return file_list;
 }
 
-#else // --- Implementação para Windows ---
+#else // --- Implementation for Windows ---
 
 char *platform_get_config_dir(void) {
   char path[MAX_PATH];
-  // CSIDL_APPDATA corresponde a %APPDATA%
+  // CSIDL_APPDATA corresponds to %APPDATA%
   if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_APPDATA, NULL, 0, path))) {
     strcat_s(path, MAX_PATH, "\\ordo");
     return strdup(path);
@@ -141,9 +143,9 @@ char *platform_get_config_dir(void) {
 
 char *platform_get_data_dir(void) {
   char path[MAX_PATH];
-  // CSIDL_LOCAL_APPDATA corresponde a %LOCALAPPDATA%
+  // CSIDL_LOCAL_APPDATA corresponds to %LOCALAPPDATA%
   if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path))) {
-    char* ordo_path = path_join(path, "ordo");
+    char *ordo_path = path_join(path, "ordo");
     return ordo_path;
   }
   return NULL;
@@ -181,7 +183,7 @@ FileList platform_list_files_in_dir(const char *dir_path,
                                     const char *extension) {
   FileList file_list = {.files = NULL, .count = 0};
   char search_path[MAX_PATH];
-  snprintf(search_path, sizeof(search_path), "%s\*%s", dir_path, extension);
+  snprintf(search_path, sizeof(search_path), "%s\\*%s", dir_path, extension);
 
   int capacity = 10;
   file_list.files = malloc(capacity * sizeof(char *));
@@ -218,7 +220,7 @@ FileList platform_list_files_in_dir(const char *dir_path,
 
 #endif
 
-// --- Função Comum ---
+// --- Common Function ---
 
 void platform_free_file_list(FileList *file_list) {
   if (!file_list)

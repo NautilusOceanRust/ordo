@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 #include "i18n.h"
-#include "utils.h" // Para a funcao trim
+#include "utils.h" // For the trim function
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,7 +55,7 @@ void get_system_lang(char *lang_buf, size_t buf_size) {
   if (lang_env && strlen(lang_env) >= 2) {
     snprintf(lang_buf, 3, "%.2s", lang_env);
   } else {
-    snprintf(lang_buf, buf_size, "en"); // Padrão
+    snprintf(lang_buf, buf_size, "en"); // Default
   }
 #endif
 }
@@ -69,7 +69,8 @@ void i18n_load_language(const char *lang) {
   }
 
   char *langs_dir = path_join(PROJECT_SOURCE_ROOT, "langs");
-  if (!langs_dir) return;
+  if (!langs_dir)
+    return;
 
   char *filepath = path_join(langs_dir, lang_filename);
   if (!filepath) {
@@ -80,18 +81,17 @@ void i18n_load_language(const char *lang) {
   FILE *file = fopen(filepath, "r");
   if (!file) {
     fprintf(stderr,
-            "Aviso: Arquivo de idioma '%s' nao encontrado. Usando 'en.lang'.\n",
+            "Warning: Language file '%s' not found. Using 'en.lang'.\n",
             lang_filename);
-    free(filepath); // Libera o caminho antigo
+    free(filepath); // Free the old path
     filepath = path_join(langs_dir, "en.lang");
     if (!filepath) {
-        free(langs_dir);
-        return;
+      free(langs_dir);
+      return;
     }
     file = fopen(filepath, "r");
     if (!file) {
-      fprintf(stderr,
-              "Aviso: Nao foi possivel carregar nenhum arquivo de idioma.\n");
+      fprintf(stderr, "Warning: Could not load any language file.\n");
       free(langs_dir);
       free(filepath);
       return;
@@ -119,7 +119,7 @@ void i18n_load_language(const char *lang) {
       char *key = line;
       char *value = separator + 1;
 
-      // Remove newlines e espacos extras
+      // Remove newlines and extra spaces
       value[strcspn(value, "\n\r")] = 0;
       char *trimmed_key = trim(key);
       char *trimmed_value = trim(value);
@@ -130,7 +130,7 @@ void i18n_load_language(const char *lang) {
           Translation *new_translations =
               realloc(temp_translations, capacity * sizeof(Translation));
           if (!new_translations) {
-            // Libera memória antes de sair
+            // Free memory before exiting
             free(trimmed_key);
             free(trimmed_value);
             for (int i = 0; i < temp_num_translations; i++) {
@@ -148,7 +148,7 @@ void i18n_load_language(const char *lang) {
         temp_translations[temp_num_translations].value = trimmed_value;
         temp_num_translations++;
       } else {
-        // Libera memória se a chave ou valor forem inválidos
+        // Free memory if the key or value are invalid
         free(trimmed_key);
         free(trimmed_value);
       }
@@ -171,8 +171,8 @@ void i18n_init(const char *initial_lang) {
   }
 }
 
-// A funcao de destruicao nao e estritamente necessaria com alocacao estatica,
-// mas e uma boa pratica para o futuro.
+// The destroy function is not strictly necessary with static allocation,
+// but it's good practice for the future.
 void i18n_destroy() {
   if (translations) {
     for (int i = 0; i < num_translations; i++) {

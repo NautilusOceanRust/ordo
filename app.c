@@ -18,7 +18,7 @@ bool app_init(AppState *app) {
   SetConsoleCP(CP_UTF8);
 #endif
 
-  *app = (AppState){0}; // Zera a estrutura
+  *app = (AppState){0}; // Zero out the structure
 
   config_load(&app->config);
   theme_load_external();

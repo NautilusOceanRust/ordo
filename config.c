@@ -1,5 +1,5 @@
 #include "config.h"
-#include "platform_utils.h" // Inclui o novo módulo
+#include "platform_utils.h" // Include the new module
 #include "theme.h"
 #include "utils.h"
 #include <stdio.h>
@@ -8,7 +8,7 @@
 
 #define MAX_LINE_LEN 256
 
-// (O resto das definições de cores padrão permanece o mesmo)
+// (The rest of the default color definitions remain the same)
 #define DEFAULT_COLOR_HEADER_PAIR 1
 #define DEFAULT_COLOR_HEADER_FG COLOR_YELLOW
 #define DEFAULT_COLOR_HEADER_BG COLOR_BLACK
@@ -31,7 +31,7 @@
 #define DEFAULT_COLOR_TASK_PENDING_FG COLOR_WHITE
 #define DEFAULT_COLOR_TASK_PENDING_BG COLOR_BLACK
 
-// Funcao para definir valores padrao
+// Function to set default values
 void set_default_config(AppConfig *config) {
   config->color_pair_header = DEFAULT_COLOR_HEADER_PAIR;
   config->color_pair_status_done = DEFAULT_COLOR_DONE_PAIR;
@@ -44,7 +44,7 @@ void set_default_config(AppConfig *config) {
   snprintf(config->theme_name, sizeof(config->theme_name), "Ordo Classic");
 }
 
-// Funcao para criar o arquivo de configuracao com valores padrao
+// Function to create the configuration file with default values
 static void create_default_config_file(const char *path) {
   FILE *file = fopen(path, "w");
   if (!file)
@@ -64,7 +64,7 @@ void config_load(AppConfig *config) {
 
   char *config_dir = platform_get_config_dir();
   if (!config_dir)
-    return; // Falha ao obter o diretório de configuração
+    return; // Failed to get the configuration directory
 
   platform_create_dir_recursive(config_dir);
 
@@ -108,7 +108,8 @@ void config_load(AppConfig *config) {
         if (strcmp(trimmed_key, "lang") == 0) {
           snprintf(config->lang, sizeof(config->lang), "%s", trimmed_value);
         } else if (strcmp(trimmed_key, "theme") == 0) {
-          snprintf(config->theme_name, sizeof(config->theme_name), "%s", trimmed_value);
+          snprintf(config->theme_name, sizeof(config->theme_name), "%s",
+                   trimmed_value);
         }
       }
       free(trimmed_key);
@@ -162,7 +163,7 @@ void config_init_color_pairs(const AppConfig *config) {
     init_pair(config->color_pair_task_pending, theme->task_pending_fg,
               theme->task_pending_bg);
   } else {
-    // Fallback para cores padrão
+    // Fallback to default colors
     init_pair(DEFAULT_COLOR_HEADER_PAIR, DEFAULT_COLOR_HEADER_FG,
               DEFAULT_COLOR_HEADER_BG);
     init_pair(DEFAULT_COLOR_DONE_PAIR, DEFAULT_COLOR_DONE_FG,

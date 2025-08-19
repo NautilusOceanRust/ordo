@@ -5,10 +5,10 @@
 #include <stdio.h>
 #include <time.h>
 
-// Função para atualizar a lógica de rolagem da tela
+// Function to update the screen scrolling logic
 static void update_scroll(AppState *app) {
   extern WINDOW *content_win;
-  int content_height = getmaxy(content_win) - 2; // Borda superior e inferior
+  int content_height = getmaxy(content_win) - 2; // Top and bottom border
 
   if (app->current_selection < app->scroll_offset) {
     app->scroll_offset = app->current_selection;
@@ -18,7 +18,7 @@ static void update_scroll(AppState *app) {
   }
 }
 
-// Função para redesenhar toda a interface
+// Function to redraw the entire interface
 static void redraw_ui(AppState *app) {
   extern WINDOW *sidebar_win, *content_win;
 
@@ -28,7 +28,7 @@ static void redraw_ui(AppState *app) {
                    &app->config, app->scroll_offset, app->current_selection,
                    app->current_view);
 
-  // Exibe o relógio
+  // Display the clock
   time_t now = time(NULL);
   struct tm *local_time = localtime(&now);
   char time_str[6];
@@ -41,7 +41,7 @@ static void redraw_ui(AppState *app) {
 int main() {
   AppState app;
   if (!app_init(&app)) {
-    fprintf(stderr, "Falha ao inicializar a aplicação.\n");
+    fprintf(stderr, "Failed to initialize the application.\n");
     return 1;
   }
 

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Função auxiliar para preparar uma statement
+// Helper function to prepare a statement
 static OrdoResult prepare_stmt(sqlite3 *db, sqlite3_stmt **stmt,
                                const char *sql) {
   if (sqlite3_prepare_v2(db, sql, -1, stmt, NULL) != SQLITE_OK) {
@@ -71,7 +71,7 @@ OrdoResult database_init(sqlite3 *db_conn, Database *db) {
     return ORDO_ERROR_DATABASE;
   }
 
-  // Prepara todas as statements. Se alguma falhar, limpa e retorna erro.
+  // Prepare all statements. If any fail, clean up and return an error.
   if (prepare_stmt(db->db, &db->add_task_stmt,
                    "INSERT INTO tarefas (descricao, concluida) VALUES (?, 0);") != ORDO_OK ||
       prepare_stmt(db->db, &db->remove_task_stmt,
@@ -90,7 +90,7 @@ OrdoResult database_init(sqlite3 *db_conn, Database *db) {
       prepare_stmt(db->db, &db->load_deleted_tasks_stmt,
                    "SELECT id, descricao, concluida FROM tarefas "
                    "WHERE is_deleted = 1 ORDER BY id;") != ORDO_OK) {
-    database_close(db); // Garante a limpeza em caso de falha
+    database_close(db); // Ensures cleanup in case of failure
     return ORDO_ERROR_DATABASE;
   }
 
@@ -114,24 +114,25 @@ void database_close(Database *db) {
   }
 }
 
-static OrdoResult load_tasks_generic(sqlite3_stmt *select_stmt, TaskList *list) {
-  task_list_clear(list); // Limpa a lista antes de carregar novas tarefas
+static OrdoResult load_tasks_generic(sqlite3_stmt *select_stmt,
+                                     TaskList *list) {
+  task_list_clear(list); // Clear the list before loading new tasks
 
   while (sqlite3_step(select_stmt) == SQLITE_ROW) {
     Tarefa task;
     task.id = sqlite3_column_int(select_stmt, 0);
     const unsigned char *desc = sqlite3_column_text(select_stmt, 1);
-    // Copia a descrição de forma segura para a estrutura da tarefa.
+    // Safely copy the description to the task structure.
     if (desc) {
       snprintf(task.descricao, MAX_DESCRICAO, "%s", (const char *)desc);
     } else {
       task.descricao[0] = '\0';
     }
     task.concluida = sqlite3_column_int(select_stmt, 2);
-    
+
     if (!task_list_add(list, &task)) {
-        sqlite3_reset(select_stmt);
-        return ORDO_ERROR_GENERIC; // Falha ao adicionar na lista
+      sqlite3_reset(select_stmt);
+      return ORDO_ERROR_GENERIC; // Failed to add to the list
     }
   }
 
