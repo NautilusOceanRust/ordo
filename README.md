@@ -211,13 +211,23 @@ This tool allows you to import tasks from a JSON or plain text file.
 ```
 
 **How to use:**
+
+The second argument to the importer is the path to the database file. This path varies by operating system.
+
+*   **Linux:** `~/.local/share/ordo/tasks.db`
+*   **macOS:** `~/.local/share/ordo/tasks.db`
+*   **Windows:** `%LOCALAPPDATA%\ordo\tasks.db` (e.g., `C:\Users\YourUser\AppData\Local\ordo\tasks.db`)
+
 ```bash
-# The first argument is the path to the JSON file
-# The second argument is the path to the database file
-./build/ordo-importer tasks.json ~/.config/ordo/tasks.db
+# Example on Linux/macOS
+./build/ordo-importer tasks.json ~/.local/share/ordo/tasks.db
+
+# Example on Windows (Command Prompt)
+.\build\ordo-importer.exe tasks.json %LOCALAPPDATA%\ordo\tasks.db
 ```
 
 ## 🕹️ How to Use
+
 
 To start the program, run the compiled file:
 
@@ -245,14 +255,30 @@ To start the program, run the compiled file:
 
 ## ⚙️ Configuration
 
-Ordo creates a configuration file at `~/.config/ordo/config.ini`. You can edit this file to customize the application.
+Ordo stores its configuration files, database, and themes in standard user directories that vary by operating system.
+
+| OS      | Path                                       | Description                                |
+| :------ | :----------------------------------------- | :----------------------------------------- |
+| Linux   | `~/.config/ordo/`                          | Config (`config.ini`) and themes (`.theme`) |
+|         | `~/.local/share/ordo/`                     | Database (`tasks.db`)                      |
+| macOS   | `~/.config/ordo/`                          | Config (`config.ini`) and themes (`.theme`) |
+|         | `~/.local/share/ordo/`                     | Database (`tasks.db`)                      |
+| Windows | `%APPDATA%\ordo\`                          | Config (`config.ini`) and themes (`.theme`) |
+|         | `%LOCALAPPDATA%\ordo\`                     | Database (`tasks.db`)                      |
+
+*   On Windows, `%APPDATA%` typically resolves to `C:\Users\<YourUser>\AppData\Roaming`.
+*   On Windows, `%LOCALAPPDATA%` typically resolves to `C:\Users\<YourUser>\AppData\Local`.
+
+You can customize the application by editing `config.ini`.
 
 *   **Language:** Change the `lang` key to the two-letter code of the desired language (e.g., `lang = en`). The language files are in the `langs/` folder.
 *   **Theme:** Change the `theme` key to the name of one of the available themes (e.g., `theme = Dracula`).
 
 ### Adding New Themes
 
-You can create your own themes! Create a `.theme` file in the `~/.config/ordo/themes/` directory. Use the following format:
+You can create your own themes! Create a `.theme` file inside the configuration directory for your OS (in a subfolder named `themes`). For example, on Linux, the path would be `~/.config/ordo/themes/my_theme.theme`.
+
+Use the following format:
 
 ```ini
 # ~/.config/ordo/themes/my_theme.theme
