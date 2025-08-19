@@ -1,4 +1,4 @@
-# 🤓 Ordo - Task Manager for the Terminal
+# 📝 Ordo - Task Manager for the Terminal
 
 Ordo is a simple, lightweight, and customizable task manager designed to be used entirely from your terminal 💻. It is built in C with the ncurses library, focusing on efficiency and ease of use.
 
