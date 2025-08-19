@@ -2,4 +2,3 @@
 /build/
 *.d
 /tests/
-*.sh
