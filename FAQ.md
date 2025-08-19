@@ -1,10 +1,10 @@
-# FAQ - Frequently Asked Questions
+# 🧐 FAQ - Frequently Asked Questions
 
 This page answers some common questions about Ordo.
 
 ---
 
-### Compilation and Installation
+### 🛠️ Compilation and Installation
 
 **Q: How do I compile the project?**
 
@@ -24,7 +24,7 @@ A: The project was written with portability in mind, using code that adapts to t
 
 ---
 
-### Usage and Features
+### 🚀 Usage and Features
 
 **Q: What is the `ordo-importer` executable that is created along with `ordo`?**
 
@@ -49,7 +49,7 @@ A: Go to the `langs/` directory in the source code, copy an existing file (e.g.,
 
 ---
 
-### Troubleshooting
+### 🐛 Troubleshooting
 
 **Q: I accidentally deleted a task. Can I recover it?**
 
@@ -63,7 +63,7 @@ A: This is usually a terminal configuration issue, not an Ordo issue. Ordo uses 
 
 ---
 
-### For Developers
+### 👨‍💻 For Developers
 
 **Q: What is the database schema?**
 

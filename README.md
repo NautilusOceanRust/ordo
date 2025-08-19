@@ -1,8 +1,8 @@
-# Ordo - Task Manager for the Terminal
+# 🤓 Ordo - Task Manager for the Terminal
 
-Ordo is a simple, lightweight, and customizable task manager designed to be used entirely from your terminal. It is built in C with the ncurses library, focusing on efficiency and ease of use.
+Ordo is a simple, lightweight, and customizable task manager designed to be used entirely from your terminal 💻. It is built in C with the ncurses library, focusing on efficiency and ease of use.
 
-### Appearance
+### Appearance ✨
 ```
 ┌────────────────────────────┐┌──────────────────────────────────────────────────┐
 │           📝 Ordo          ││ 📋 Tasks                                         │
@@ -21,7 +21,7 @@ Ordo is a simple, lightweight, and customizable task manager designed to be used
  Task restored successfully! ✨
 ```
 
-## Features
+## 🚀 Features
 
 *   **Add, Edit, and Complete Tasks:** Full lifecycle management of your tasks.
 *   **Trash and Restore:** Move tasks to the trash instead of permanently deleting them, with the option to restore them later.
@@ -33,13 +33,13 @@ Ordo is a simple, lightweight, and customizable task manager designed to be used
 *   **Simple Configuration:** Customize the language and theme through a simple configuration file.
 *   **Enhanced UI:** The user interface has been improved for a better experience.
 
-## Project Architecture
+## 🏗️ Project Architecture
 
 Ordo is designed with a modular architecture to separate concerns and make the code easier to maintain and extend. The main components are:
 
 -   **`main.c`**: The entry point of the application, responsible for the main loop and event handling.
 -   **`ui.c` / `ui.h`**: Manages all aspects of the user interface, including drawing windows, menus, and tasks using the `ncurses` library.
--   **`database.c` / `database.h`**: Handles all interactions with the SQLite database, such as adding, deleting, and querying tasks.
+-   **`database.c` / `database.h`**: Handles all interactions with the SQLite database 💾, such as adding, deleting, and querying tasks.
 -   **`task_list.c` / `task_list.h`**: An abstraction that manages the list of tasks in memory.
 -   **`config.c` / `config.h`**: Manages loading and saving user settings from the `config.ini` file.
 -   **`theme.c` / `theme.h`**: Responsible for loading and managing color themes.
@@ -47,7 +47,7 @@ Ordo is designed with a modular architecture to separate concerns and make the c
 -   **`utils.c` / `utils.h`**: Contains utility functions used throughout the project.
 -   **`platform_utils.c` / `platform_utils.h`**: Provides platform-specific functionalities, such as finding configuration directories.
 
-## How to Compile
+## 🛠️ How to Compile
 
 Ordo uses the **Meson** build system with **Ninja** and can be compiled on Linux, macOS, and Windows.
 
@@ -108,7 +108,7 @@ This will create two executables in the `build/` directory:
 *   `ordo` (or `ordo.exe` on Windows): The main program.
 *   `ordo-importer` (or `ordo-importer.exe` on Windows): A tool to import tasks from a JSON or plain text file into the Ordo database.
 
-### `ordo-importer`
+### `ordo-importer` 🤖
 
 This tool allows you to import tasks from a JSON or plain text file.
 
@@ -136,7 +136,7 @@ This tool allows you to import tasks from a JSON or plain text file.
 ./build/ordo-importer tasks.json ~/.config/ordo/tasks.db
 ```
 
-## How to Use
+## 🕹️ How to Use
 
 To start the program, run the compiled file:
 
@@ -162,7 +162,7 @@ To start the program, run the compiled file:
 | **d**                   | Permanently delete the selected task       | Trash            |
 | **q** / **7**           | Exit the program / Return to the main view | Main / Trash     |
 
-## Configuration
+## ⚙️ Configuration
 
 Ordo creates a configuration file at `~/.config/ordo/config.ini`. You can edit this file to customize the application.
 
@@ -194,10 +194,11 @@ task_pending_bg = COLOR_BLACK
 
 The available colors are: `COLOR_BLACK`, `COLOR_RED`, `COLOR_GREEN`, `COLOR_YELLOW`, `COLOR_BLUE`, `COLOR_MAGENTA`, `COLOR_CYAN`, `COLOR_WHITE`.
 
-## Contributions
+## 🤝 Contributions
 
 Contributions are welcome! Feel free to open an *issue* to report bugs or suggest new features. If you wish, you can create a *pull request* with your improvements.
 
-## License
+## 📜 License
 
 This project is distributed under the MIT license. See the `LICENSE` file for more details.
+
