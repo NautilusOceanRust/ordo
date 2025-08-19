@@ -104,18 +104,90 @@ meson setup build
 ninja -C build
 ```
 
-#### Compiling with Clang
+#### Compiling with Clang/LLVM
 
-If you have Clang installed and want to use it instead of GCC, you can tell Meson to use it by setting the `CC` environment variable during the setup step:
+If you have Clang installed and want to use it instead of GCC, you can tell Meson to use it by setting the `CC` environment variable. This is also useful for developers on macOS, where Clang is the default compiler.
 
 ```bash
+# Set CC to 'clang' before running meson setup
 CC=clang meson setup build
+
+# Compile as usual
 ninja -C build
 ```
+
+If you are on Windows and using the MSYS2 environment, you can install Clang with `pacman -S mingw-w64-x86_64-clang` and follow the same steps.
+
+#### Advanced: Compiling on Windows (Native with Clang-cl)
+
+It is also possible to build a fully native Windows executable using Clang in MSVC-compatible mode (`clang-cl.exe`) and the Visual Studio Build Tools, without relying on MSYS2/MinGW. This method is more complex but produces a binary that links against the native Windows C runtime.
+
+**Prerequisites:**
+1.  **Visual Studio Build Tools:** Install from the [Visual Studio website](https://visualstudio.microsoft.com/downloads/), including the "Desktop development with C++" workload.
+2.  **LLVM/Clang:** Install from the [official LLVM website](https://releases.llvm.org/download.html).
+3.  **`vcpkg` Package Manager:** This is the recommended way to manage native dependencies.
+    ```powershell
+    git clone https://github.com/microsoft/vcpkg.git
+    .\vcpkg\bootstrap-vcpkg.bat
+    .\vcpkg\vcpkg integrate install
+    ```
+
+**Steps:**
+
+1.  **Open the Developer Command Prompt:** All subsequent commands must be run in a **"x64 Native Tools Command Prompt for VS"**.
+
+2.  **Install Dependencies:** Use `vcpkg` to install the required libraries.
+    ```bash
+    vcpkg install pdcurses:x64-windows sqlite3:x64-windows cjson:x64-windows
+    ```
+
+3.  **Configure Meson:** Navigate to the project directory and run Meson setup, pointing it to the `vcpkg` toolchain file.
+    ```bash
+    # Replace <path\to\vcpkg> with the actual path to your vcpkg installation
+    meson setup build --toolchain <path\to\vcpkg>\scripts\buildsystems\vcpkg.cmake
+    ```
+
+4.  **Set Clang-cl as the Compiler:** Reconfigure the build directory to use `clang-cl`.
+    ```bash
+    meson configure build -D c=clang-cl -D cpp=clang-cl
+    ```
+
+5.  **Compile:** Run Ninja as usual.
+    ```bash
+    ninja -C build
+    ```
 
 This will create two executables in the `build/` directory:
 *   `ordo` (or `ordo.exe` on Windows): The main program.
 *   `ordo-importer` (or `ordo-importer.exe` on Windows): A tool to import tasks from a JSON or plain text file into the Ordo database.
+
+## 💻 Development with VS Code
+```
+
+This project is pre-configured for development with Visual Studio Code.
+
+### Prerequisites
+
+1.  **[Install VS Code](https://code.visualstudio.com/)**.
+2.  Install the recommended extensions:
+    *   `ms-vscode.cpptools`: C/C++ language support.
+    *   `ms-vscode.mesonbuild`: Meson language support.
+
+### How to Build and Debug
+
+The repository includes pre-configured build tasks and a debug launch profile.
+
+*   **To Build:**
+    1.  Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`).
+    2.  Type and select **`Tasks: Run Build Task`**.
+    3.  Choose **`Meson: Build`**. This will compile the project into the `build/` directory.
+
+*   **To Debug:**
+    1.  Set a breakpoint in the code (e.g., in `main.c`).
+    2.  Go to the **Run and Debug** view (the bug icon on the sidebar).
+    3.  Select **`Debug Ordo`** from the dropdown menu and press the green play button (F5).
+
+    The debugger will automatically build the project (if needed) and launch `ordo` in an external terminal, attaching the debugger to it.
 
 ### `ordo-importer` 🤖
 
