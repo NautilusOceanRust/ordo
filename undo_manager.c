@@ -1,0 +1,116 @@
+#include "undo_manager.h"
+#include "app.h" // Para acesso ao banco de dados
+#include "error.h"
+#include <stdio.h>
+#include <string.h>
+
+// Função auxiliar interna para empurrar um comando para uma pilha
+static void push_command(Command *stack, int *top, const Command *cmd) {
+  if (*top >= UNDO_STACK_SIZE - 1) {
+    // Se a pilha estiver cheia, descarta o item mais antigo
+    memmove(&stack[0], &stack[1], (UNDO_STACK_SIZE - 1) * sizeof(Command));
+    *top = UNDO_STACK_SIZE - 2;
+  }
+  (*top)++;
+  stack[*top] = *cmd;
+}
+
+void undo_manager_init(UndoManager *manager) {
+  manager->undo_top = -1;
+  manager->redo_top = -1;
+}
+
+void undo_manager_push(UndoManager *manager, ActionType type, int task_id,
+                       const char *old_data, const char *new_data,
+                       int old_state) {
+  Command cmd;
+  cmd.type = type;
+  cmd.task_id = task_id;
+  cmd.old_state = old_state;
+
+  if (old_data) {
+    snprintf(cmd.old_data, MAX_DESCRICAO, "%s", old_data);
+  } else {
+    cmd.old_data[0] = '\0';
+  }
+
+  if (new_data) {
+    snprintf(cmd.new_data, MAX_DESCRICAO, "%s", new_data);
+  } else {
+    cmd.new_data[0] = '\0';
+  }
+
+  push_command(manager->undo_stack, &manager->undo_top, &cmd);
+}
+
+void undo_manager_clear_redo(UndoManager *manager) {
+  manager->redo_top = -1;
+}
+
+bool undo_manager_perform_undo(UndoManager *manager, AppState *app) {
+  if (manager->undo_top < 0) {
+    return false;
+  }
+
+  Command cmd = manager->undo_stack[manager->undo_top--];
+  OrdoResult result = ORDO_OK;
+
+  switch (cmd.type) {
+  case ACTION_ADD:
+    result = database_remove_task(&app->db, cmd.task_id);
+    break;
+  case ACTION_DELETE:
+    result = database_restore_task(&app->db, cmd.task_id);
+    break;
+  case ACTION_EDIT:
+    result =
+        database_update_task_description(&app->db, cmd.task_id, cmd.old_data);
+    break;
+  case ACTION_TOGGLE:
+    result = database_toggle_task_status(&app->db, cmd.task_id, !cmd.old_state);
+    break;
+  }
+
+  if (result == ORDO_OK) {
+    push_command(manager->redo_stack, &manager->redo_top, &cmd);
+    return true;
+  }
+
+  // Se a operação falhar, restaura o comando na pilha de undo
+  manager->undo_top++;
+  return false;
+}
+
+bool undo_manager_perform_redo(UndoManager *manager, AppState *app) {
+  if (manager->redo_top < 0) {
+    return false;
+  }
+
+  Command cmd = manager->redo_stack[manager->redo_top--];
+  OrdoResult result = ORDO_OK;
+
+  switch (cmd.type) {
+  case ACTION_ADD:
+    result = database_restore_task(&app->db, cmd.task_id);
+    break;
+  case ACTION_DELETE:
+    result = database_remove_task(&app->db, cmd.task_id);
+    break;
+  case ACTION_EDIT:
+    result =
+        database_update_task_description(&app->db, cmd.task_id, cmd.new_data);
+    break;
+  case ACTION_TOGGLE:
+    result = database_toggle_task_status(&app->db, cmd.task_id, cmd.old_state);
+    break;
+  }
+
+  if (result == ORDO_OK) {
+    push_command(manager->undo_stack, &manager->undo_top, &cmd);
+    return true;
+  }
+
+  // Se a operação falhar, restaura o comando na pilha de redo
+  manager->redo_top++;
+  return false;
+}
