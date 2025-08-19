@@ -207,6 +207,17 @@ static void handle_trash_view_input(AppState *app, int choice) {
   }
 }
 
+// --- Máscaras de bits para eventos de scroll do mouse ---
+// Agrupa todos os eventos possíveis para scroll para cima (Botão 4)
+#define SCROLL_UP_EVENTS                                                       
+  (BUTTON4_PRESSED | BUTTON4_RELEASED | BUTTON4_CLICKED |                      
+   BUTTON4_DOUBLE_CLICKED | BUTTON4_TRIPLE_CLICKED)
+
+// Agrupa todos os eventos possíveis para scroll para baixo (Botão 5)
+#define SCROLL_DOWN_EVENTS                                                     
+  (BUTTON5_PRESSED | BUTTON5_RELEASED | BUTTON5_CLICKED |                      
+   BUTTON5_DOUBLE_CLICKED | BUTTON5_TRIPLE_CLICKED)
+
 // Função principal que processa toda a entrada do teclado e mouse
 void input_handle(AppState *app, int key) {
   if (key == ERR) { // Timeout, nenhuma tecla pressionada
@@ -230,8 +241,7 @@ void input_handle(AppState *app, int key) {
   }
   if (key == KEY_UP) {
     if (app->task_list.count > 0)
-      app->current_selection =
-          (app->current_selection - 1 + app->task_list.count) %
+      app->current_selection = (app->current_selection - 1 + app->task_list.count) %
           app->task_list.count;
     return;
   }
@@ -245,31 +255,35 @@ void input_handle(AppState *app, int key) {
     return;
   }
   if (key == KEY_MOUSE) {
-      MEVENT event;
-      if (getmouse(&event) == OK) {
-          extern WINDOW *content_win, *sidebar_win;
-          if (wenclose(content_win, event.y, event.x)) {
-              if (event.bstate & BUTTON4_PRESSED) { // Scroll up
-                  if (app->scroll_offset > 0) app->scroll_offset--;
-              } else if (event.bstate & BUTTON5_PRESSED) { // Scroll down
-                  int height = getmaxy(content_win) - 2;
-                  if (app->scroll_offset + height < app->task_list.count) app->scroll_offset++;
-              } else if (event.bstate & (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED)) {
-                  int clicked_y = event.y - getbegy(content_win) - 1;
-                  if (clicked_y >= 0) {
-                      int clicked_task = clicked_y + app->scroll_offset;
-                      if (clicked_task < app->task_list.count) {
-                          app->current_selection = clicked_task;
-                          if (event.bstate & BUTTON1_DOUBLE_CLICKED) {
-                              ui_display_full_task(&app->task_list.tasks[app->current_selection], &app->config);
-                          }
-                      }
-                  }
+    MEVENT event;
+    if (getmouse(&event) == OK) {
+      extern WINDOW *content_win, *sidebar_win;
+      if (wenclose(content_win, event.y, event.x)) {
+        if (event.bstate & SCROLL_UP_EVENTS) { // Scroll up
+          if (app->scroll_offset > 0)
+            app->scroll_offset--;
+        } else if (event.bstate & SCROLL_DOWN_EVENTS) { // Scroll down
+          int height = getmaxy(content_win) - 2;
+          if (app->scroll_offset + height < app->task_list.count)
+            app->scroll_offset++;
+        } else if (event.bstate & (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED)) {
+          int clicked_y = event.y - getbegy(content_win) - 1;
+          if (clicked_y >= 0) {
+            int clicked_task = clicked_y + app->scroll_offset;
+            if (clicked_task < app->task_list.count) {
+              app->current_selection = clicked_task;
+              if (event.bstate & BUTTON1_DOUBLE_CLICKED) {
+                ui_display_full_task(
+                    &app->task_list.tasks[app->current_selection],
+                    &app->config);
               }
-          } else if (wenclose(sidebar_win, event.y, event.x)) {
-              key = ui_handle_sidebar_click(event, app->current_view);
+            }
           }
+        }
+      } else if (wenclose(sidebar_win, event.y, event.x)) {
+        key = ui_handle_sidebar_click(event, app->current_view);
       }
+    }
   }
 
   // Ações específicas da visão
@@ -279,3 +293,4 @@ void input_handle(AppState *app, int key) {
     handle_trash_view_input(app, key);
   }
 }
+
