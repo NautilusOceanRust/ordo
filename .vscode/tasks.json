@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Meson: Build",
+            "type": "shell",
+            "command": "ninja",
+            "args": [
+                "-C",
+                "build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Compile the project using Ninja."
+        },
+        {
+            "label": "Meson: Reconfigure",
+            "type": "shell",
+            "command": "meson",
+            "args": [
+                "setup",
+                "--reconfigure",
+                "build"
+            ],
+            "problemMatcher": [],
+            "detail": "Reconfigure the build directory."
+        },
+        {
+            "label": "Meson: Clean",
+            "type": "shell",
+            "command": "ninja",
+            "args": [
+                "-C",
+                "build",
+                "clean"
+            ],
+            "problemMatcher": [],
+            "detail": "Clean the build directory."
+        }
+    ]
+}

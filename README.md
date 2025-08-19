@@ -104,6 +104,15 @@ meson setup build
 ninja -C build
 ```
 
+#### Compiling with Clang
+
+If you have Clang installed and want to use it instead of GCC, you can tell Meson to use it by setting the `CC` environment variable during the setup step:
+
+```bash
+CC=clang meson setup build
+ninja -C build
+```
+
 This will create two executables in the `build/` directory:
 *   `ordo` (or `ordo.exe` on Windows): The main program.
 *   `ordo-importer` (or `ordo-importer.exe` on Windows): A tool to import tasks from a JSON or plain text file into the Ordo database.

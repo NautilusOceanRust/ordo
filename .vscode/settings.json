@@ -1,0 +1,12 @@
+{
+    // These settings are recommended for working on this project.
+
+    // C/C++ extension settings
+    "C_Cpp.default.configurationProvider": "ms-vscode.meson-tools",
+
+    // Recommended extensions for this workspace
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "ms-vscode.meson-tools"
+    ]
+}

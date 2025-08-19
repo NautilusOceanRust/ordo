@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Ordo",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/ordo",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true, // ncurses requires an external console
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Meson: Build", // Automatically build before debugging
+            "miDebuggerPath": "/usr/bin/gdb"
+        }
+    ]
+}
