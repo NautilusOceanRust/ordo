@@ -2,3 +2,4 @@
 /build/
 *.d
 /tests/
+git-commit.sh
