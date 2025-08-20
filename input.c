@@ -75,14 +75,17 @@ static void handle_main_view_input(AppState *app, int choice) {
     auto_free_ptr char *new_desc = NULL;
     result = ui_add_task(&app->config, &new_desc);
     if (result == ORDO_OK) {
-      int new_id = -1;
-      result = database_add_task(&app->db, new_desc, &new_id);
-      if (result == ORDO_OK) {
-        undo_manager_push(&app->undo_manager, ACTION_ADD, new_id, NULL, NULL, 0);
-        handle_result(ORDO_ADD_SUCCESS, app);
-        app->refresh_tasks = true;
-      } else {
-        handle_result(result, app);
+      if (ui_confirm_action("CONFIRM_ADD_PROMPT", "MENU_ADD", &app->config)) {
+        int new_id = -1;
+        result = database_add_task(&app->db, new_desc, &new_id);
+        if (result == ORDO_OK) {
+          undo_manager_push(&app->undo_manager, ACTION_ADD, new_id, NULL, NULL,
+                            0);
+          handle_result(ORDO_ADD_SUCCESS, app);
+          app->refresh_tasks = true;
+        } else {
+          handle_result(result, app);
+        }
       }
     } else {
       handle_result(result, app);
@@ -91,17 +94,20 @@ static void handle_main_view_input(AppState *app, int choice) {
   }
   case '2': { // Mover para a Lixeira
     if (task_id != -1) {
-      Tarefa *task = &app->task_list.tasks[app->current_selection];
-      undo_manager_push(&app->undo_manager, ACTION_DELETE, task_id,
-                        task->descricao, NULL, task->concluida);
-      result = database_remove_task(&app->db, task_id);
-      if (result == ORDO_OK) {
-        handle_result(ORDO_TRASH_SUCCESS, app);
-        app->refresh_tasks = true;
-      } else {
-        // A ação falhou, então removemos do histórico de undo
-        app->undo_manager.undo_top--;
-        handle_result(result, app);
+      if (ui_confirm_action("CONFIRM_TRASH_PROMPT", "MENU_REMOVE",
+                            &app->config)) {
+        Tarefa *task = &app->task_list.tasks[app->current_selection];
+        undo_manager_push(&app->undo_manager, ACTION_DELETE, task_id,
+                          task->descricao, NULL, task->concluida);
+        result = database_remove_task(&app->db, task_id);
+        if (result == ORDO_OK) {
+          handle_result(ORDO_TRASH_SUCCESS, app);
+          app->refresh_tasks = true;
+        } else {
+          // A ação falhou, então removemos do histórico de undo
+          app->undo_manager.undo_top--;
+          handle_result(result, app);
+        }
       }
     }
     break;
@@ -111,15 +117,20 @@ static void handle_main_view_input(AppState *app, int choice) {
       auto_free_ptr char *new_desc = NULL;
       result = ui_edit_task(&app->config, &new_desc);
       if (result == ORDO_OK) {
-        result = database_update_task_description(&app->db, task_id, new_desc);
-        if (result == ORDO_OK) {
-          undo_manager_push(&app->undo_manager, ACTION_EDIT, task_id,
-                            app->task_list.tasks[app->current_selection].descricao,
-                            new_desc, 0);
-          handle_result(ORDO_EDIT_SUCCESS, app);
-          app->refresh_tasks = true;
-        } else {
-          handle_result(result, app);
+        if (ui_confirm_action("CONFIRM_EDIT_PROMPT", "MENU_EDIT",
+                              &app->config)) {
+          result =
+              database_update_task_description(&app->db, task_id, new_desc);
+          if (result == ORDO_OK) {
+            undo_manager_push(
+                &app->undo_manager, ACTION_EDIT, task_id,
+                app->task_list.tasks[app->current_selection].descricao,
+                new_desc, 0);
+            handle_result(ORDO_EDIT_SUCCESS, app);
+            app->refresh_tasks = true;
+          } else {
+            handle_result(result, app);
+          }
         }
       } else {
         handle_result(result, app);
@@ -129,18 +140,22 @@ static void handle_main_view_input(AppState *app, int choice) {
   }
   case '4': { // Marcar como Concluída/Pendente
     if (task_id != -1) {
-      Tarefa *task = &app->task_list.tasks[app->current_selection];
-      undo_manager_push(&app->undo_manager, ACTION_TOGGLE, task_id, NULL, NULL,
-                        task->concluida);
-      result = database_toggle_task_status(&app->db, task_id, task->concluida);
-      if (result == ORDO_OK) {
-        app->refresh_tasks = true;
-        OrdoResult msg =
-            task->concluida ? ORDO_TOGGLE_SUCCESS_REOPEN : ORDO_TOGGLE_SUCCESS_DONE;
-        handle_result(msg, app);
-      } else {
-        app->undo_manager.undo_top--;
-        handle_result(result, app);
+      if (ui_confirm_action("CONFIRM_TOGGLE_PROMPT", "MENU_TOGGLE",
+                            &app->config)) {
+        Tarefa *task = &app->task_list.tasks[app->current_selection];
+        undo_manager_push(&app->undo_manager, ACTION_TOGGLE, task_id, NULL,
+                          NULL, task->concluida);
+        result =
+            database_toggle_task_status(&app->db, task_id, task->concluida);
+        if (result == ORDO_OK) {
+          app->refresh_tasks = true;
+          OrdoResult msg = task->concluida ? ORDO_TOGGLE_SUCCESS_REOPEN
+                                           : ORDO_TOGGLE_SUCCESS_DONE;
+          handle_result(msg, app);
+        } else {
+          app->undo_manager.undo_top--;
+          handle_result(result, app);
+        }
       }
     }
     break;
@@ -209,14 +224,10 @@ static void handle_trash_view_input(AppState *app, int choice) {
 
 // --- Máscaras de bits para eventos de scroll do mouse ---
 // Agrupa todos os eventos possíveis para scroll para cima (Botão 4)
-#define SCROLL_UP_EVENTS                                                       
-  (BUTTON4_PRESSED | BUTTON4_RELEASED | BUTTON4_CLICKED |                      
-   BUTTON4_DOUBLE_CLICKED | BUTTON4_TRIPLE_CLICKED)
+#define SCROLL_UP_EVENTS (BUTTON4_PRESSED | BUTTON4_RELEASED | BUTTON4_CLICKED | BUTTON4_DOUBLE_CLICKED | BUTTON4_TRIPLE_CLICKED)
 
 // Agrupa todos os eventos possíveis para scroll para baixo (Botão 5)
-#define SCROLL_DOWN_EVENTS                                                     
-  (BUTTON5_PRESSED | BUTTON5_RELEASED | BUTTON5_CLICKED |                      
-   BUTTON5_DOUBLE_CLICKED | BUTTON5_TRIPLE_CLICKED)
+#define SCROLL_DOWN_EVENTS (BUTTON5_PRESSED | BUTTON5_RELEASED | BUTTON5_CLICKED | BUTTON5_DOUBLE_CLICKED | BUTTON5_TRIPLE_CLICKED)
 
 // Função principal que processa toda a entrada do teclado e mouse
 void input_handle(AppState *app, int key) {
@@ -235,19 +246,22 @@ void input_handle(AppState *app, int key) {
     return;
   }
   if (key == 't') {
-    app->current_view = (app->current_view == VIEW_MAIN) ? VIEW_TRASH : VIEW_MAIN;
+    app->current_view =
+        (app->current_view == VIEW_MAIN) ? VIEW_TRASH : VIEW_MAIN;
     app->refresh_tasks = true;
     return;
   }
   if (key == KEY_UP) {
     if (app->task_list.count > 0)
-      app->current_selection = (app->current_selection - 1 + app->task_list.count) %
+      app->current_selection =
+          (app->current_selection - 1 + app->task_list.count) %
           app->task_list.count;
     return;
   }
   if (key == KEY_DOWN) {
     if (app->task_list.count > 0)
-      app->current_selection = (app->current_selection + 1) % app->task_list.count;
+      app->current_selection =
+          (app->current_selection + 1) % app->task_list.count;
     return;
   }
   if (key == KEY_RESIZE) {
