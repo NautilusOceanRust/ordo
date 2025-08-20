@@ -295,58 +295,99 @@ static void ui_settings_select_language(AppConfig *config) {
 }
 
 void settings_ui_show(AppConfig *config) {
+  const char *options[] = {"CHANGE_LANGUAGE", "CHANGE_THEME",
+                           "BACK_TO_MAIN_MENU"};
+  int num_options = sizeof(options) / sizeof(options[0]);
+  int current_selection = 0;
   int choice = 0;
-  while (choice != '3') {
-    clear();
+
+  int win_h = 10;
+  int win_w = 50;
+  int win_y = (LINES - win_h) / 2;
+  int win_x = (COLS - win_w) / 2;
+
+  WINDOW *win = newwin(win_h, win_w, win_y, win_x);
+  keypad(win, TRUE);
+
+  while (choice != 'q' && choice != 'Q' && choice != 27 /* ESC */) {
+    wclear(win);
+    box(win, 0, 0);
+
+    // Título
     wchar_t wide_buffer[256];
-    char str_buffer[256];
-    char truncated_buffer[256];
-
     mbstowcs(wide_buffer, get_translation("SETTINGS_MENU"), 256);
-    mvaddwstr((LINES - 5) / 2, (COLS - wcswidth(wide_buffer, -1)) / 2,
-              wide_buffer);
+    wattron(win, COLOR_PAIR(config->color_pair_header));
+    mvwaddwstr(win, 1, (win_w - wcswidth(wide_buffer, -1)) / 2, wide_buffer);
+    wattroff(win, COLOR_PAIR(config->color_pair_header));
 
-    int y = (LINES - 5) / 2 + 2;
-    int x = (COLS - 20) / 2;
+    // Opções
+    for (int i = 0; i < num_options; i++) {
+      int y = 3 + i;
+      int x = 4;
+      if (i == current_selection) {
+        wattron(win, A_REVERSE);
+      }
 
-    snprintf(str_buffer, sizeof(str_buffer), "1. %s",
-             get_translation("CHANGE_LANGUAGE"));
-    truncar_por_largura(truncated_buffer, sizeof(truncated_buffer), str_buffer,
-                        COLS - x * 2);
-    mbstowcs(wide_buffer, truncated_buffer, 256);
-    mvaddwstr(y++, x, wide_buffer);
+      char str_buffer[256];
+      snprintf(str_buffer, sizeof(str_buffer), "%d. %s", i + 1,
+               get_translation(options[i]));
 
-    snprintf(str_buffer, sizeof(str_buffer), "2. %s",
-             get_translation("CHANGE_THEME"));
-    truncar_por_largura(truncated_buffer, sizeof(truncated_buffer), str_buffer,
-                        COLS - x * 2);
-    mbstowcs(wide_buffer, truncated_buffer, 256);
-    mvaddwstr(y++, x, wide_buffer);
+      char truncated_buffer[256];
+      truncar_por_largura(truncated_buffer, sizeof(truncated_buffer),
+                          str_buffer, win_w - x * 2);
+      mbstowcs(wide_buffer, truncated_buffer, 256);
+      mvwaddwstr(win, y, x, wide_buffer);
 
-    int len = snprintf(str_buffer, sizeof(str_buffer), "3. %s",
-             get_translation("BACK_TO_MAIN_MENU"));
-    if ((size_t)len >= sizeof(str_buffer)) {
-      // Handle error
+      if (i == current_selection) {
+        wattroff(win, A_REVERSE);
+      }
     }
-    truncar_por_largura(truncated_buffer, sizeof(truncated_buffer), str_buffer,
-                        COLS - x * 2);
-    mbstowcs(wide_buffer, truncated_buffer, 256);
-    mvaddwstr(y, x, wide_buffer);
 
-    mbstowcs(wide_buffer, get_translation("PROMPT_CHOICE"), 256);
-    mvaddwstr(LINES - 1, (COLS - wcswidth(wide_buffer, -1) - 2) / 2,
-              wide_buffer);
-
-    refresh();
-    choice = getch();
+    wrefresh(win);
+    choice = wgetch(win);
 
     switch (choice) {
+    case KEY_UP:
+      current_selection = (current_selection - 1 + num_options) % num_options;
+      break;
+    case KEY_DOWN:
+      current_selection = (current_selection + 1) % num_options;
+      break;
+    case '\n':
+    case KEY_ENTER:
+      switch (current_selection) {
+      case 0: // Change Language
+        ui_settings_select_language(config);
+        // Redesenha a janela de configurações, pois a tela foi limpa
+        win = newwin(win_h, win_w, win_y, win_x);
+        keypad(win, TRUE);
+        break;
+      case 1: // Change Theme
+        ui_settings_select_theme(config);
+        // Redesenha a janela de configurações
+        win = newwin(win_h, win_w, win_y, win_x);
+        keypad(win, TRUE);
+        break;
+      case 2: // Back
+        choice = 'q';
+        break;
+      }
+      break;
     case '1':
       ui_settings_select_language(config);
+      win = newwin(win_h, win_w, win_y, win_x);
+      keypad(win, TRUE);
       break;
     case '2':
       ui_settings_select_theme(config);
+      win = newwin(win_h, win_w, win_y, win_x);
+      keypad(win, TRUE);
+      break;
+    case '3':
+      choice = 'q';
       break;
     }
   }
+
+  delwin(win);
 }
