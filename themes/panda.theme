@@ -1,0 +1,16 @@
+# Panda Theme
+name = Panda
+header_fg = COLOR_CYAN
+header_bg = COLOR_BLUE
+done_fg = COLOR_GREEN
+done_bg = COLOR_BLUE
+pending_fg = COLOR_WHITE
+pending_bg = COLOR_BLUE
+error_fg = COLOR_RED
+error_bg = COLOR_BLUE
+success_fg = COLOR_GREEN
+success_bg = COLOR_BLUE
+task_done_fg = COLOR_WHITE
+task_done_bg = COLOR_BLUE
+task_pending_fg = COLOR_WHITE
+task_pending_bg = COLOR_BLUE

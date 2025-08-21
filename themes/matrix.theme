@@ -1,0 +1,16 @@
+# Matrix Theme
+name = Matrix
+header_fg = COLOR_GREEN
+header_bg = COLOR_BLACK
+done_fg = COLOR_GREEN
+done_bg = COLOR_BLACK
+pending_fg = COLOR_GREEN
+pending_bg = COLOR_BLACK
+error_fg = COLOR_RED
+error_bg = COLOR_BLACK
+success_fg = COLOR_GREEN
+success_bg = COLOR_BLACK
+task_done_fg = COLOR_GREEN
+task_done_bg = COLOR_BLACK
+task_pending_fg = COLOR_GREEN
+task_pending_bg = COLOR_BLACK

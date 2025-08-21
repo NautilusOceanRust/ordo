@@ -1,0 +1,16 @@
+# Catppuccin Latte Theme
+name = Catppuccin Latte
+header_fg = COLOR_BLUE
+header_bg = COLOR_WHITE
+done_fg = COLOR_GREEN
+done_bg = COLOR_WHITE
+pending_fg = COLOR_BLACK
+pending_bg = COLOR_WHITE
+error_fg = COLOR_RED
+error_bg = COLOR_WHITE
+success_fg = COLOR_GREEN
+success_bg = COLOR_WHITE
+task_done_fg = COLOR_BLACK
+task_done_bg = COLOR_WHITE
+task_pending_fg = COLOR_BLACK
+task_pending_bg = COLOR_WHITE

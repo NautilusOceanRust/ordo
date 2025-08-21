@@ -1,0 +1,16 @@
+# Synthwave '84 Theme
+name = Synthwave '84
+header_fg = COLOR_MAGENTA
+header_bg = COLOR_BLUE
+done_fg = COLOR_CYAN
+done_bg = COLOR_BLUE
+pending_fg = COLOR_YELLOW
+pending_bg = COLOR_BLUE
+error_fg = COLOR_RED
+error_bg = COLOR_BLUE
+success_fg = COLOR_CYAN
+success_bg = COLOR_BLUE
+task_done_fg = COLOR_YELLOW
+task_done_bg = COLOR_BLUE
+task_pending_fg = COLOR_YELLOW
+task_pending_bg = COLOR_BLUE

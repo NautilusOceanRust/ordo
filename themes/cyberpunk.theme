@@ -1,0 +1,16 @@
+# Cyberpunk Theme
+name = Cyberpunk
+header_fg = COLOR_CYAN
+header_bg = COLOR_MAGENTA
+done_fg = COLOR_YELLOW
+done_bg = COLOR_MAGENTA
+pending_fg = COLOR_WHITE
+pending_bg = COLOR_MAGENTA
+error_fg = COLOR_RED
+error_bg = COLOR_MAGENTA
+success_fg = COLOR_YELLOW
+success_bg = COLOR_MAGENTA
+task_done_fg = COLOR_WHITE
+task_done_bg = COLOR_MAGENTA
+task_pending_fg = COLOR_WHITE
+task_pending_bg = COLOR_MAGENTA
