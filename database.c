@@ -19,7 +19,7 @@ static OrdoResult prepare_stmt(sqlite3 *db, sqlite3_stmt **stmt,
 
 static OrdoResult migrate_database_schema(Database *db) {
   sqlite3_stmt *stmt;
-  const char *sql = "PRAGMA table_info(tarefas);";
+  const char *sql = "PRAGMA table_info(tasks);";
   bool column_exists = false;
 
   if (sqlite3_prepare_v2(db->db, sql, -1, &stmt, NULL) != SQLITE_OK) {
@@ -40,7 +40,7 @@ static OrdoResult migrate_database_schema(Database *db) {
   if (!column_exists) {
     char *errMsg = 0;
     const char *sql_alter =
-        "ALTER TABLE tarefas ADD COLUMN is_deleted INTEGER NOT NULL DEFAULT 0;";
+        "ALTER TABLE tasks ADD COLUMN is_deleted INTEGER NOT NULL DEFAULT 0;";
     if (sqlite3_exec(db->db, sql_alter, 0, 0, &errMsg) != SQLITE_OK) {
       fprintf(stderr, "Error adding column to table: %s\n", errMsg);
       sqlite3_free(errMsg);
@@ -56,7 +56,7 @@ OrdoResult database_init(sqlite3 *db_conn, Database *db) {
 
   char *errMsg = 0;
   const char *sql_create =
-      "CREATE TABLE IF NOT EXISTS tarefas (id INTEGER PRIMARY KEY, descricao "
+      "CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY, descricao "
       "TEXT NOT NULL, concluida INTEGER NOT NULL DEFAULT 0, is_deleted INTEGER "
       "NOT NULL DEFAULT 0);";
   if (sqlite3_exec(db->db, sql_create, 0, 0, &errMsg) != SQLITE_OK) {
@@ -73,22 +73,22 @@ OrdoResult database_init(sqlite3 *db_conn, Database *db) {
 
   // Prepare all statements. If any fail, clean up and return an error.
   if (prepare_stmt(db->db, &db->add_task_stmt,
-                   "INSERT INTO tarefas (descricao, concluida) VALUES (?, 0);") != ORDO_OK ||
+                   "INSERT INTO tasks (descricao, concluida) VALUES (?, 0);") != ORDO_OK ||
       prepare_stmt(db->db, &db->remove_task_stmt,
-                   "UPDATE tarefas SET is_deleted = 1 WHERE id = ?;") != ORDO_OK ||
+                   "UPDATE tasks SET is_deleted = 1 WHERE id = ?;") != ORDO_OK ||
       prepare_stmt(db->db, &db->toggle_task_status_stmt,
-                   "UPDATE tarefas SET concluida = ? WHERE id = ?;") != ORDO_OK ||
+                   "UPDATE tasks SET concluida = ? WHERE id = ?;") != ORDO_OK ||
       prepare_stmt(db->db, &db->update_task_description_stmt,
-                   "UPDATE tarefas SET descricao = ? WHERE id = ?;") != ORDO_OK ||
+                   "UPDATE tasks SET descricao = ? WHERE id = ?;") != ORDO_OK ||
       prepare_stmt(db->db, &db->load_tasks_stmt,
-                   "SELECT id, descricao, concluida FROM tarefas "
+                   "SELECT id, descricao, concluida FROM tasks "
                    "WHERE is_deleted = 0 ORDER BY id;") != ORDO_OK ||
       prepare_stmt(db->db, &db->restore_task_stmt,
-                   "UPDATE tarefas SET is_deleted = 0 WHERE id = ?;") != ORDO_OK ||
+                   "UPDATE tasks SET is_deleted = 0 WHERE id = ?;") != ORDO_OK ||
       prepare_stmt(db->db, &db->perm_delete_task_stmt,
-                   "DELETE FROM tarefas WHERE id = ?;") != ORDO_OK ||
+                   "DELETE FROM tasks WHERE id = ?;") != ORDO_OK ||
       prepare_stmt(db->db, &db->load_deleted_tasks_stmt,
-                   "SELECT id, descricao, concluida FROM tarefas "
+                   "SELECT id, descricao, concluida FROM tasks "
                    "WHERE is_deleted = 1 ORDER BY id;") != ORDO_OK) {
     database_close(db); // Ensures cleanup in case of failure
     return ORDO_ERROR_DATABASE;
@@ -119,7 +119,7 @@ static OrdoResult load_tasks_generic(sqlite3_stmt *select_stmt,
   task_list_clear(list); // Clear the list before loading new tasks
 
   while (sqlite3_step(select_stmt) == SQLITE_ROW) {
-    Tarefa task;
+    Task task;
     task.id = sqlite3_column_int(select_stmt, 0);
     const unsigned char *desc = sqlite3_column_text(select_stmt, 1);
     // Safely copy the description to the task structure.

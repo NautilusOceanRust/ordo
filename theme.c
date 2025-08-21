@@ -1,19 +1,19 @@
 #define _POSIX_C_SOURCE 200809L
 #include "theme.h"
-#include "platform_utils.h" // Inclui o novo módulo
+#include "platform_utils.h" // Include the new module
 #include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 
-// Estrutura para mapear nomes de cores para valores ncurses
+// Structure to map color names to ncurses values
 typedef struct {
   const char *name;
   short value;
 } ColorMap;
 
-// Mapa de nomes de cores para valores ncurses
+// Map of color names to ncurses values
 static const ColorMap color_map[] = {
     {"COLOR_BLACK", COLOR_BLACK}, {"COLOR_RED", COLOR_RED},
     {"COLOR_GREEN", COLOR_GREEN}, {"COLOR_YELLOW", COLOR_YELLOW},
@@ -22,17 +22,17 @@ static const ColorMap color_map[] = {
 };
 static const int num_colors = sizeof(color_map) / sizeof(ColorMap);
 
-// Funcao para converter nome de cor em valor ncurses
+// Function to convert color name to ncurses value
 static short color_name_to_value(const char *name) {
   for (int i = 0; i < num_colors; i++) {
     if (strcasecmp(color_map[i].name, name) == 0) {
       return color_map[i].value;
     }
   }
-  return -1; // Cor nao encontrada
+  return -1; // Color not found
 }
 
-// Array com a definição de 40 temas de cores populares.
+// Array with the definition of 40 popular color themes.
 const OrdoTheme ordo_themes[] = {
     {"Ordo Classic", COLOR_YELLOW, COLOR_BLACK, COLOR_GREEN, COLOR_BLACK,
      COLOR_WHITE, COLOR_BLACK, COLOR_RED, COLOR_BLACK, COLOR_GREEN, COLOR_BLACK,
@@ -269,7 +269,7 @@ static void parse_and_add_theme(const char *file_path) {
   fclose(file);
 
   if (theme_name) {
-    // Validar se todas as cores foram carregadas corretamente
+    // Validate if all colors were loaded correctly
     if (new_theme.header_fg == -1 || new_theme.header_bg == -1 ||
         new_theme.done_fg == -1 || new_theme.done_bg == -1 ||
         new_theme.pending_fg == -1 || new_theme.pending_bg == -1 ||
@@ -279,10 +279,10 @@ static void parse_and_add_theme(const char *file_path) {
         new_theme.task_pending_fg == -1 || new_theme.task_pending_bg == -1) {
 
       fprintf(stderr,
-              "Aviso: Tema '%s' no arquivo '%s' tem cores invalidas e nao sera "
-              "carregado.\n",
+              "Warning: Theme '%s' in file '%s' has invalid colors and will not be "
+              "loaded.\n",
               theme_name, file_path);
-      free(theme_name); // Libera a memoria do nome, ja que o tema foi rejeitado
+      free(theme_name); // Free the name memory, as the theme was rejected
       return;
     }
 
@@ -290,7 +290,7 @@ static void parse_and_add_theme(const char *file_path) {
       OrdoTheme *new_external_themes = realloc(
           external_themes, (num_external_themes + 1) * sizeof(OrdoTheme));
       if (!new_external_themes) {
-        // Nao foi possivel alocar, libera o nome do tema e retorna
+        // Could not allocate, free the theme name and return
         free(theme_name);
         return;
       }
@@ -299,7 +299,7 @@ static void parse_and_add_theme(const char *file_path) {
       external_themes[num_external_themes++] = new_theme;
     } else {
       fprintf(stderr,
-              "Aviso: Tema '%s' do arquivo '%s' ja existe e sera ignorado.\n",
+              "Warning: Theme '%s' from file '%s' already exists and will be ignored.\n",
               theme_name, file_path);
       free(theme_name);
     }
@@ -319,7 +319,7 @@ static void load_themes_from_path(const char *path) {
 }
 
 void theme_load_external() {
-  // 1. Carrega do diretório de configuração do usuário
+  // 1. Load from the user's configuration directory
   char *config_dir = platform_get_config_dir();
   if (config_dir) {
     char *themes_path = path_join(config_dir, "themes");
@@ -331,10 +331,10 @@ void theme_load_external() {
     free(config_dir);
   }
 
-  // 2. Carrega do subdiretório 'themes' local
+  // 2. Load from the local 'themes' subdirectory
   load_themes_from_path("themes");
 
-  // 3. Carrega arquivos .theme do diretório raiz do projeto
+  // 3. Load .theme files from the project root directory
   load_themes_from_path(".");
 }
 

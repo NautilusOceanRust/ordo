@@ -7,9 +7,10 @@
 #define INITIAL_CAPACITY 10
 
 void task_list_init(TaskList *list) {
-    list->tasks = malloc(INITIAL_CAPACITY * sizeof(Tarefa));
+    list->tasks = malloc(INITIAL_CAPACITY * sizeof(Task));
     if (list->tasks == NULL) {
-        // Em um aplicativo real, um tratamento de erro mais robusto seria necessário.
+        // In a real-world application, more robust error handling would be needed,
+        // such as returning an error code.
         exit(EXIT_FAILURE); 
     }
     list->count = 0;
@@ -25,18 +26,18 @@ void task_list_free(TaskList *list) {
     }
 }
 
-bool task_list_add(TaskList *list, const Tarefa *task) {
+bool task_list_add(TaskList *list, const Task *task) {
     if (list->count >= list->capacity) {
         int new_capacity = list->capacity * 2;
-        Tarefa *new_tasks = realloc(list->tasks, new_capacity * sizeof(Tarefa));
+        Task *new_tasks = realloc(list->tasks, new_capacity * sizeof(Task));
         if (new_tasks == NULL) {
-            return false; // Falha na realocação
+            return false; // Reallocation failed
         }
         list->tasks = new_tasks;
         list->capacity = new_capacity;
     }
     
-    // Copia os dados da tarefa para a lista.
+    // Copy the task data to the list.
     list->tasks[list->count].id = task->id;
     list->tasks[list->count].concluida = task->concluida;
     safe_snprintf(list->tasks[list->count].descricao, MAX_DESCRICAO, "%s", task->descricao);
@@ -47,18 +48,18 @@ bool task_list_add(TaskList *list, const Tarefa *task) {
 
 void task_list_remove(TaskList *list, int index) {
     if (index < 0 || index >= list->count) {
-        return; // Índice inválido
+        return; // Invalid index
     }
 
-    // Move as tarefas subsequentes para preencher o espaço.
+    // Move subsequent tasks to fill the space.
     if (index < list->count - 1) {
-        safe_memmove(&list->tasks[index], &list->tasks[index + 1], (list->count - index - 1) * sizeof(Tarefa));
+        safe_memmove(&list->tasks[index], &list->tasks[index + 1], (list->count - index - 1) * sizeof(Task));
     }
 
     list->count--;
 }
 
 void task_list_clear(TaskList *list) {
-    // Apenas redefine a contagem. A memória alocada pode ser reutilizada.
+    // Just reset the count. The allocated memory can be reused.
     list->count = 0;
 }

@@ -1,7 +1,7 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-// Enum para os códigos de resultado usados em toda a aplicação.
+// Enum for result codes used throughout the application.
 typedef enum {
   ORDO_OK = 0,
 

@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Definição da estrutura da tarefa, para referência.
-// O programa não usa esta struct diretamente, mas interage
-// com o banco de dados que armazena esses campos.
+// Definition of the task structure, for reference.
+// The program does not use this struct directly, but interacts
+// with the database that stores these fields.
 /*
 #define MAX_DESCRICAO 200
 typedef struct {
@@ -16,38 +16,38 @@ typedef struct {
 } Tarefa;
 */
 
-// Função para processar um arquivo de texto
+// Function to process a text file
 int process_txt_file(FILE *fp, sqlite3 *db, sqlite3_stmt *stmt) {
   char buffer[202]; // +2 para \n e \0
   int contador = 0;
   while (fgets(buffer, sizeof(buffer), fp)) {
-    // Remove a quebra de linha de forma idiomática e segura
+    // Remove the newline in an idiomatic and safe way
     buffer[strcspn(buffer, "\n")] = 0;
 
-    // Ignorar linhas em branco
+    // Ignore blank lines
     if (strlen(buffer) == 0) {
       continue;
     }
 
-    // Vincular a descrição da tarefa à statement.
-    // SQLITE_TRANSIENT faz uma cópia do buffer, o que é seguro dentro de um
+    // Bind the task description to the statement.
+    // SQLITE_TRANSIENT makes a copy of the buffer, which is safe inside a
     // loop.
     if (sqlite3_bind_text(stmt, 1, buffer, -1, SQLITE_TRANSIENT) != SQLITE_OK) {
       fprintf(stderr, "Erro ao vincular texto: %s\n", sqlite3_errmsg(db));
       continue;
     }
 
-    // Executar a statement
+    // Execute the statement
     if (sqlite3_step(stmt) != SQLITE_DONE) {
       fprintf(stderr, "Erro ao inserir tarefa: %s\n", sqlite3_errmsg(db));
     } else {
       contador++;
     }
 
-    // Limpa os valores vinculados da statement preparada.
+    // Clears the bound values from the prepared statement.
     sqlite3_clear_bindings(stmt);
 
-    // Resetar a statement para a próxima iteração
+    // Reset the statement for the next iteration
     sqlite3_reset(stmt);
   }
   return contador;
@@ -55,7 +55,7 @@ int process_txt_file(FILE *fp, sqlite3 *db, sqlite3_stmt *stmt) {
 
 #define JSON_CHUNK_SIZE 4096
 
-// Função para processar um arquivo JSON de forma mais eficiente em termos de memória
+// Function to process a JSON file more memory-efficiently
 int process_json_file(FILE *fp, sqlite3 *db, sqlite3_stmt *stmt) {
     char *buffer = NULL;
     char *temp_buffer;
@@ -63,7 +63,7 @@ int process_json_file(FILE *fp, sqlite3 *db, sqlite3_stmt *stmt) {
     size_t bytes_read;
     size_t total_bytes = 0;
 
-    // Lê o arquivo em pedaços (chunks)
+    // Reads the file in chunks
     while ((bytes_read = fread(buffer + total_bytes, 1, JSON_CHUNK_SIZE, fp)) > 0) {
         total_bytes += bytes_read;
         buffer_size += JSON_CHUNK_SIZE;
@@ -76,7 +76,7 @@ int process_json_file(FILE *fp, sqlite3 *db, sqlite3_stmt *stmt) {
         buffer = temp_buffer;
     }
 
-    // Adiciona o terminador nulo
+    // Add the null terminator
     temp_buffer = realloc(buffer, total_bytes + 1);
     if (temp_buffer == NULL) {
         fprintf(stderr, "Erro: Falha ao realocar memória para o terminador nulo.\n");
@@ -123,7 +123,7 @@ int process_json_file(FILE *fp, sqlite3 *db, sqlite3_stmt *stmt) {
 }
 
 
-// Função para detectar o tipo de arquivo
+// Function to detect the file type
 const char *get_file_type(const char *filename) {
   const char *dot = strrchr(filename, '.');
   if (!dot || dot == filename)
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
   const char *arquivo_db = argv[2];
   const char *file_type = get_file_type(arquivo_entrada);
 
-  // 1. Abrir o arquivo de entrada
+  // 1. Open the input file
   FILE *fp = fopen(arquivo_entrada, "r");
   if (fp == NULL) {
     fprintf(stderr, "Erro: Não foi possível abrir o arquivo de entrada '%s'.\n",
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  // 2. Abrir/Criar o banco de dados SQLite
+  // 2. Open/Create the SQLite database
   sqlite3 *db;
   if (sqlite3_open(arquivo_db, &db)) {
     fprintf(stderr, "Erro: Não foi possível abrir o banco de dados: %s\n",
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  // 3. Criar a tabela de tarefas se ela não existir
+  // 3. Create the tasks table if it doesn't exist
   char *err_msg = 0;
   const char *sql_create = "CREATE TABLE IF NOT EXISTS tarefas ("                           "id INTEGER PRIMARY KEY AUTOINCREMENT, "                           "descricao TEXT NOT NULL, "                           "concluida INTEGER NOT NULL DEFAULT 0);";
 
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  // 4. Preparar a statement de inserção
+  // 4. Prepare the insert statement
   sqlite3_stmt *stmt;
   const char *sql_insert = "INSERT INTO tarefas (descricao) VALUES (?);";
   if (sqlite3_prepare_v2(db, sql_insert, -1, &stmt, NULL) != SQLITE_OK) {
@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
 
   printf("%d tarefas foram importadas com sucesso!\n", contador);
 
-  // 6. Limpeza
+  // 6. Cleanup
   sqlite3_finalize(stmt);
   sqlite3_close(db);
   fclose(fp);

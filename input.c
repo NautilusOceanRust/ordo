@@ -6,7 +6,7 @@
 #include "ui.h"
 #include "utils.h"
 
-// Função auxiliar para exibir mensagens de resultado na UI
+// Helper function to display result messages in the UI
 static void handle_result(OrdoResult result, AppState *app) {
   switch (result) {
   case ORDO_OK:
@@ -59,7 +59,7 @@ static void handle_result(OrdoResult result, AppState *app) {
   }
 }
 
-// Lida com a entrada do usuário na visão principal
+// Handles user input in the main view
 static void handle_main_view_input(AppState *app, int choice) {
   OrdoResult result = ORDO_OK;
   int task_id = (app->task_list.count > 0)
@@ -104,7 +104,7 @@ static void handle_main_view_input(AppState *app, int choice) {
           handle_result(ORDO_TRASH_SUCCESS, app);
           app->refresh_tasks = true;
         } else {
-          // A ação falhou, então removemos do histórico de undo
+          // The action failed, so we remove it from the undo history
           app->undo_manager.undo_top--;
           handle_result(result, app);
         }
@@ -190,7 +190,7 @@ static void handle_main_view_input(AppState *app, int choice) {
   }
 }
 
-// Lida com a entrada do usuário na visão da lixeira
+// Handles user input in the trash view
 static void handle_trash_view_input(AppState *app, int choice) {
   OrdoResult result = ORDO_OK;
   if (app->task_list.count <= 0) return;
@@ -222,20 +222,20 @@ static void handle_trash_view_input(AppState *app, int choice) {
   }
 }
 
-// --- Máscaras de bits para eventos de scroll do mouse ---
-// Agrupa todos os eventos possíveis para scroll para cima (Botão 4)
+// --- Bitmasks for mouse scroll events ---
+// Groups all possible events for scroll up (Button 4)
 #define SCROLL_UP_EVENTS (BUTTON4_PRESSED | BUTTON4_RELEASED | BUTTON4_CLICKED | BUTTON4_DOUBLE_CLICKED | BUTTON4_TRIPLE_CLICKED)
 
-// Agrupa todos os eventos possíveis para scroll para baixo (Botão 5)
+// Groups all possible events for scroll down (Button 5)
 #define SCROLL_DOWN_EVENTS (BUTTON5_PRESSED | BUTTON5_RELEASED | BUTTON5_CLICKED | BUTTON5_DOUBLE_CLICKED | BUTTON5_TRIPLE_CLICKED)
 
-// Função principal que processa toda a entrada do teclado e mouse
+// Main function that processes all keyboard and mouse input
 void input_handle(AppState *app, int key) {
   if (key == ERR) { // Timeout, nenhuma tecla pressionada
     return;
   }
 
-  // Ações globais
+  // Global actions
   if (key == '7' || key == 'q') {
     if (app->current_view == VIEW_TRASH) {
       app->current_view = VIEW_MAIN;
@@ -265,7 +265,7 @@ void input_handle(AppState *app, int key) {
     return;
   }
   if (key == KEY_RESIZE) {
-    // O layout será redesenhado no próximo loop, não precisa de ação aqui
+    // The layout will be redrawn in the next loop, no action needed here
     return;
   }
   if (key == KEY_MOUSE) {
@@ -300,7 +300,7 @@ void input_handle(AppState *app, int key) {
     }
   }
 
-  // Ações específicas da visão
+  // View-specific actions
   if (app->current_view == VIEW_MAIN) {
     handle_main_view_input(app, key);
   } else { // VIEW_TRASH

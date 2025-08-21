@@ -14,7 +14,7 @@
 #define MAX_LANGS 20
 #define MAX_LANG_CODE_LEN 10
 
-// Funcao para aplicar um tema temporariamente para preview
+// Function to temporarily apply a theme for preview
 static void apply_theme_preview(const OrdoTheme *theme, const AppConfig *config) {
     init_pair(config->color_pair_header, theme->header_fg, theme->header_bg);
     init_pair(config->color_pair_status_done, theme->done_fg, theme->done_bg);
@@ -313,14 +313,14 @@ void settings_ui_show(AppConfig *config) {
     wclear(win);
     box(win, 0, 0);
 
-    // Título
+    // Title
     wchar_t wide_buffer[256];
     mbstowcs(wide_buffer, get_translation("SETTINGS_MENU"), 256);
     wattron(win, COLOR_PAIR(config->color_pair_header));
     mvwaddwstr(win, 1, (win_w - wcswidth(wide_buffer, -1)) / 2, wide_buffer);
     wattroff(win, COLOR_PAIR(config->color_pair_header));
 
-    // Opções
+    // Options
     for (int i = 0; i < num_options; i++) {
       int y = 3 + i;
       int x = 4;
@@ -358,13 +358,13 @@ void settings_ui_show(AppConfig *config) {
       switch (current_selection) {
       case 0: // Change Language
         ui_settings_select_language(config);
-        // Redesenha a janela de configurações, pois a tela foi limpa
+        // Redraw the settings window, as the screen was cleared
         win = newwin(win_h, win_w, win_y, win_x);
         keypad(win, TRUE);
         break;
       case 1: // Change Theme
         ui_settings_select_theme(config);
-        // Redesenha a janela de configurações
+        // Redraw the settings window
         win = newwin(win_h, win_w, win_y, win_x);
         keypad(win, TRUE);
         break;

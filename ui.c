@@ -8,11 +8,11 @@
 #include <string.h>
 #include <wchar.h>
 
-// --- Variáveis Globais da UI ---
+// --- Global UI Variables ---
 WINDOW *sidebar_win, *content_win, *status_win;
 #define SIDEBAR_WIDTH 30
 
-// --- Funções de Ciclo de Vida ---
+// --- Lifecycle Functions ---
 void ui_init(const AppConfig *config) {
   initscr();
   cbreak();
@@ -22,7 +22,7 @@ void ui_init(const AppConfig *config) {
   config_init_color_pairs(config);
   curs_set(0);
   mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-  define_key("\x1b[<", 27); // Habilita o modo de relatório do mouse xterm
+  define_key("\x1b[<", 27); // Enable xterm mouse reporting mode
 }
 
 void ui_destroy() {
@@ -32,7 +32,7 @@ void ui_destroy() {
   endwin();
 }
 
-// --- Funções de Desenho e Layout ---
+// --- Drawing and Layout Functions ---
 void ui_draw_layout() {
   int screen_h, screen_w;
   getmaxyx(stdscr, screen_h, screen_w);
@@ -65,7 +65,7 @@ void ui_display_menu(WINDOW *win, const AppConfig *config,
   const char *title = (current_view == VIEW_MAIN) ? "APP_TITLE" : "TRASH_TITLE";
   mbstowcs(wide_buffer, get_translation(title), 256);
 
-  // Aplica a cor do cabeçalho
+  // Apply header color
   wattron(win, COLOR_PAIR(config->color_pair_header));
   mvwaddwstr(win, 1, (SIDEBAR_WIDTH - wcswidth(wide_buffer, -1)) / 2,
              wide_buffer);
@@ -117,13 +117,13 @@ void ui_display_tasks(WINDOW *win, const Tarefa *tasks, int num_tasks,
   wclear(win);
   box(win, 0, 0);
 
-  // Adiciona o título da janela de conteúdo
+  // Add content window title
   const char *title_key =
       (current_view == VIEW_MAIN) ? "TASKS_TITLE" : "TRASH_TITLE";
   wchar_t wide_title[100];
   mbstowcs(wide_title, get_translation(title_key), 100);
 
-  // Aplica a cor do cabeçalho ao título
+  // Apply header color to the title
   wattron(win, COLOR_PAIR(config->color_pair_header));
   mvwaddwstr(win, 0, 3, L" ");
   mvwaddwstr(win, 0, 4, wide_title);
@@ -144,7 +144,7 @@ void ui_display_tasks(WINDOW *win, const Tarefa *tasks, int num_tasks,
     for (int i = 0; i < content_h && (scroll_offset + i) < num_tasks; ++i) {
       int task_index = scroll_offset + i;
 
-      // Define o par de cores com base no status da tarefa
+      // Set the color pair based on the task status
       short color_pair = tasks[task_index].concluida
                              ? config->color_pair_task_done
                              : config->color_pair_task_pending;
@@ -204,45 +204,45 @@ static WINDOW *create_popup(int h, int w, const char *title_key) {
   return win;
 }
 
-// --- Funções Auxiliares para Manipulação de Texto --- // Encontra o início da palavra anterior
+// --- Text Manipulation Helper Functions --- // Find the start of the previous word
 static int find_prev_word_start(const wchar_t *str, int current_pos) {
   if (current_pos == 0) return 0;
   int pos = current_pos - 1;
-  // Pula espaços em branco à esquerda
+  // Skip whitespace to the left
   while (pos > 0 && iswspace(str[pos])) {
     pos--;
   }
-  // Pula a palavra
+  // Skip the word
   while (pos > 0 && !iswspace(str[pos - 1])) {
     pos--;
   }
   return pos;
 }
 
-// Encontra o início da próxima palavra
+// Find the start of the next word
 static int find_next_word_start(const wchar_t *str, int current_pos) {
     int len = wcslen(str);
     if (current_pos >= len) return len;
     int pos = current_pos;
-    // Pula a palavra atual
+    // Skip the current word
     while(pos < len && !iswspace(str[pos])) {
         pos++;
     }
-    // Pula os espaços em branco
+    // Skip the current word
     while(pos < len && iswspace(str[pos])) {
         pos++;
     }
     return pos;
 }
 
-// --- Códigos de Tecla Customizados ---
+// --- Custom Key Codes ---
 #define KEY_CTRL_RIGHT 500
 #define KEY_CTRL_LEFT 501
 #define KEY_CTRL_BACKSPACE 502
 
-// --- Refatoração da Entrada de Texto ---
+// --- Text Input Refactoring ---
 
-// Estrutura para manter o estado do widget de entrada de texto
+// Structure to hold the state of the text input widget
 typedef struct {
   WINDOW *win;
   wchar_t *buffer;
@@ -254,12 +254,12 @@ typedef struct {
   int max_chars_per_line;
 } TextInputState;
 
-// Desenha o conteúdo do buffer de texto, o contador e o cursor
+// Draws the text buffer content, counter, and cursor
 static void draw_text_input(TextInputState *state) {
   wclear(state->win);
   box(state->win, 0, 0);
 
-  // Desenha o texto com quebra de linha
+  // Draws the text with word wrap
   int current_y = 1, current_x = 1;
   for (int i = 0; i < state->len; ++i) {
     if (current_x >= state->max_chars_per_line) {
@@ -271,12 +271,12 @@ static void draw_text_input(TextInputState *state) {
     current_x++;
   }
 
-  // Desenha o contador de caracteres
+  // Draws the character counter
   char counter[32];
   safe_snprintf(counter, sizeof(counter), "[%d/%d]", state->len, state->buffer_size - 1);
   mvwprintw(state->win, state->win_h - 2, state->win_w - strlen(counter) - 2, "%s", counter);
 
-  // Posiciona o cursor
+  // Positions the cursor
   int cursor_y = 1 + (state->cursor_pos / state->max_chars_per_line);
   int cursor_x = 1 + (state->cursor_pos % state->max_chars_per_line);
   if (cursor_y < state->win_h - 1) {
@@ -285,8 +285,8 @@ static void draw_text_input(TextInputState *state) {
   wrefresh(state->win);
 }
 
-// Processa uma única entrada de tecla e atualiza o estado
-// Retorna `false` se a edição deve terminar (Enter ou Esc), `true` caso contrário.
+// Processes a single key input and updates the state
+// Returns `false` if editing should end (Enter or Esc), `true` otherwise.
 static bool handle_text_input(TextInputState *state, wint_t ch) {
   switch (ch) {
   case '\n': // Enter
@@ -295,7 +295,7 @@ static bool handle_text_input(TextInputState *state, wint_t ch) {
     state->buffer[0] = L'\0';
     return false;
 
-  // --- Movimentação do Cursor ---
+  // --- Cursor Movement ---
   case KEY_LEFT:
     if (state->cursor_pos > 0) state->cursor_pos--;
     break;
@@ -321,7 +321,7 @@ static bool handle_text_input(TextInputState *state, wint_t ch) {
     state->cursor_pos = find_next_word_start(state->buffer, state->cursor_pos);
     break;
 
-  // --- Edição de Texto ---
+  // --- Text Editing ---
   case KEY_BACKSPACE:
   case 127:
     if (state->cursor_pos > 0) {
@@ -344,7 +344,7 @@ static bool handle_text_input(TextInputState *state, wint_t ch) {
     break;
   }
   default:
-    // Inserir caractere
+    // Insert character
     if (iswprint(ch) && state->len < state->buffer_size - 1) {
       safe_memmove(&state->buffer[state->cursor_pos + 1], &state->buffer[state->cursor_pos], (state->len - state->cursor_pos + 1) * sizeof(wchar_t));
       state->buffer[state->cursor_pos] = ch;
@@ -355,7 +355,7 @@ static bool handle_text_input(TextInputState *state, wint_t ch) {
   return true;
 }
 
-// Função principal de entrada de texto, agora refatorada.
+// Main text input function, now refactored.
 static void get_editable_input(WINDOW *win, char *buffer, int max_len) {
   wchar_t w_buffer[max_len];
   mbstowcs(w_buffer, buffer, max_len);
@@ -372,7 +372,7 @@ static void get_editable_input(WINDOW *win, char *buffer, int max_len) {
   keypad(win, TRUE);
   curs_set(1);
 
-  // Define códigos de tecla para Ctrl + Setas/Backspace
+  // Define key codes for Ctrl + Arrows/Backspace
   define_key("\x1b[1;5C", KEY_CTRL_RIGHT);
   define_key("\x1b[1;5D", KEY_CTRL_LEFT);
   define_key("\x08", KEY_CTRL_BACKSPACE);
@@ -380,7 +380,7 @@ static void get_editable_input(WINDOW *win, char *buffer, int max_len) {
   wint_t ch;
   bool keep_editing = true;
   
-  // O loop principal agora é muito mais simples
+  // The main loop is now much simpler
   while (keep_editing) {
     state.len = wcslen(state.buffer);
     if (state.cursor_pos > state.len) {
@@ -447,10 +447,10 @@ OrdoResult ui_edit_task(const AppConfig *config,
     return ORDO_ERROR_EMPTY_DESCRIPTION;
   }
 
-  // Aloca memória e retorna a nova descrição
+  // Allocates memory and returns the new description
   *new_description_out = strdup(trimmed_desc);
   if (!*new_description_out) {
-    return ORDO_ERROR_GENERIC; // Falha de alocação
+    return ORDO_ERROR_GENERIC; // Allocation failure
   }
 
   return ORDO_OK;
@@ -484,14 +484,14 @@ void ui_display_full_task(const Tarefa *task, const AppConfig *config) {
 
   mvwprintw(win, 6, 2, "%s", get_translation("VIEW_FULL_DESC"));
 
-  // Lógica de quebra de linha (word wrap)
-  int max_width = win_w - 4; // 2 de margem + 2 de borda
+  // Word wrap logic
+  int max_width = win_w - 4; // 2 for margin + 2 for border
   auto_free_ptr char *wrapped_desc = word_wrap(task->descricao, max_width);
 
   if (wrapped_desc) {
     mvwprintw(win, 8, 2, "%s", wrapped_desc);
   } else {
-    // Fallback para o comportamento antigo se a alocação falhar
+    // Fallback to the old behavior if allocation fails
     char truncated_desc[MAX_DESCRICAO];
     truncar_por_largura(truncated_desc, sizeof(truncated_desc), task->descricao,
                         max_width);
@@ -509,7 +509,7 @@ void ui_display_clock(WINDOW *win, const char *time_string) {
   getmaxyx(win, win_h, win_w);
   if (win_w <= 0) return;
 
-  // Limpa a área do relógio para evitar sobreposição
+  // Clears the clock area to avoid overlapping
   char empty_line[win_w];
   int len = safe_snprintf(empty_line, sizeof(empty_line), "%*s", win_w - 2, "");
   if ((size_t)len >= sizeof(empty_line)) {
@@ -517,7 +517,7 @@ void ui_display_clock(WINDOW *win, const char *time_string) {
   }
   mvwprintw(win, win_h - 2, 1, "%s", empty_line);
 
-  // Desenha o relógio centralizado
+  // Draws the centered clock
   mvwprintw(win, win_h - 2, (win_w - strlen(time_string)) / 2, "%s", time_string);
   wnoutrefresh(win);
 }
@@ -537,5 +537,5 @@ int ui_handle_sidebar_click(MEVENT event, AppView current_view) {
             }
         }
     }
-    return 0; // Nenhum item de menu clicado
+    return 0; // No menu item clicked
 }

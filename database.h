@@ -1,10 +1,10 @@
 /**
  * @file database.h
- * @brief Interface para o módulo de gerenciamento do banco de dados SQLite.
+ * @brief Interface for the SQLite database management module.
  *
- * Este arquivo define a estrutura `Database` e as funções para interagir
- * com o banco de dados de tarefas, incluindo inicialização, fechamento e
- * operações CRUD (Create, Read, Update, Delete).
+ * This file defines the `Database` structure and the functions to interact
+ * with the task database, including initialization, closing, and
+ * CRUD (Create, Read, Update, Delete) operations.
  */
 
 #ifndef DATABASE_H
@@ -17,103 +17,103 @@
 
 /**
  * @struct Database
- * @brief Estrutura para gerenciar a conexão com o banco de dados e as statements preparadas.
+ * @brief Structure to manage the database connection and prepared statements.
  *
- * Agrupa a conexão do SQLite e todas as `sqlite3_stmt` pré-compiladas para
- * otimizar as operações repetidas no banco de dados.
+ * Groups the SQLite connection and all pre-compiled `sqlite3_stmt` to
+ * optimize repeated database operations.
  */
 typedef struct {
-  sqlite3 *db;                                /**< Ponteiro para a conexão do banco de dados SQLite. */
-  sqlite3_stmt *add_task_stmt;                /**< Statement para adicionar uma nova tarefa. */
-  sqlite3_stmt *remove_task_stmt;             /**< Statement para mover uma tarefa para a lixeira. */
-  sqlite3_stmt *toggle_task_status_stmt;      /**< Statement para alternar o estado (concluída/pendente) de uma tarefa. */
-  sqlite3_stmt *update_task_description_stmt; /**< Statement para atualizar a descrição de uma tarefa. */
-  sqlite3_stmt *load_tasks_stmt;              /**< Statement para carregar as tarefas ativas. */
-  sqlite3_stmt *restore_task_stmt;            /**< Statement para restaurar uma tarefa da lixeira. */
-  sqlite3_stmt *perm_delete_task_stmt;        /**< Statement para deletar permanentemente uma tarefa. */
-  sqlite3_stmt *load_deleted_tasks_stmt;      /**< Statement para carregar as tarefas da lixeira. */
+  sqlite3 *db;                                /**< Pointer to the SQLite database connection. */
+  sqlite3_stmt *add_task_stmt;                /**< Statement to add a new task. */
+  sqlite3_stmt *remove_task_stmt;             /**< Statement to move a task to the trash. */
+  sqlite3_stmt *toggle_task_status_stmt;      /**< Statement to toggle the state (completed/pending) of a task. */
+  sqlite3_stmt *update_task_description_stmt; /**< Statement to update the description of a task. */
+  sqlite3_stmt *load_tasks_stmt;              /**< Statement to load active tasks. */
+  sqlite3_stmt *restore_task_stmt;            /**< Statement to restore a task from the trash. */
+  sqlite3_stmt *perm_delete_task_stmt;        /**< Statement to permanently delete a task. */
+  sqlite3_stmt *load_deleted_tasks_stmt;      /**< Statement to load tasks from the trash. */
 } Database;
 
 /**
- * @brief Inicializa a conexão com o banco de dados e prepara as statements.
- * @param[in] db_conn Uma conexão SQLite aberta.
- * @param[out] db Ponteiro para a estrutura `Database` a ser inicializada.
- * @return `ORDO_OK` em caso de sucesso, ou um código de erro em caso de falha.
+ * @brief Initializes the database connection and prepares the statements.
+ * @param[in] db_conn An open SQLite connection.
+ * @param[out] db Pointer to the `Database` structure to be initialized.
+ * @return `ORDO_OK` on success, or an error code on failure.
  */
 OrdoResult database_init(sqlite3 *db_conn, Database *db);
 
 /**
- * @brief Finaliza as statements preparadas e fecha a conexão com o banco de dados.
- * @param[in] db Ponteiro para a estrutura `Database` a ser finalizada.
+ * @brief Finalizes the prepared statements and closes the database connection.
+ * @param[in] db Pointer to the `Database` structure to be finalized.
  */
 void database_close(Database *db);
 
 /**
- * @brief Carrega as tarefas ativas (não na lixeira) do banco de dados.
- * @param[in] db Ponteiro para a estrutura `Database`.
- * @param[out] list Ponteiro para a `TaskList` onde as tarefas serão carregadas.
- * @return `ORDO_OK` em caso de sucesso.
+ * @brief Loads the active tasks (not in the trash) from the database.
+ * @param[in] db Pointer to the `Database` structure.
+ * @param[out] list Pointer to the `TaskList` where the tasks will be loaded.
+ * @return `ORDO_OK` on success.
  */
 OrdoResult database_load_tasks(Database *db, TaskList *list);
 
 /**
- * @brief Carrega as tarefas da lixeira (removidas) do banco de dados.
- * @param[in] db Ponteiro para a estrutura `Database`.
- * @param[out] list Ponteiro para a `TaskList` onde as tarefas serão carregadas.
- * @return `ORDO_OK` em caso de sucesso.
+ * @brief Loads the tasks from the trash (removed) from the database.
+ * @param[in] db Pointer to the `Database` structure.
+ * @param[out] list Pointer to the `TaskList` where the tasks will be loaded.
+ * @return `ORDO_OK` on success.
  */
 OrdoResult database_load_deleted_tasks(Database *db, TaskList *list);
 
 /**
- * @brief Adiciona uma nova tarefa ao banco de dados.
- * @param[in] db Ponteiro para a estrutura `Database`.
- * @param[in] description A descrição da nova tarefa.
- * @param[out] new_task_id Ponteiro para armazenar o ID da tarefa recém-criada.
- * @return `ORDO_OK` em caso de sucesso.
+ * @brief Adds a new task to the database.
+ * @param[in] db Pointer to the `Database` structure.
+ * @param[in] description The description of the new task.
+ * @param[out] new_task_id Pointer to store the ID of the newly created task.
+ * @return `ORDO_OK` on success.
  */
 OrdoResult database_add_task(Database *db, const char *description,
                              int *new_task_id);
 
 /**
- * @brief Move uma tarefa para a lixeira (soft delete).
- * @param[in] db Ponteiro para a estrutura `Database`.
- * @param[in] task_id O ID da tarefa a ser movida para a lixeira.
- * @return `ORDO_OK` em caso de sucesso.
+ * @brief Moves a task to the trash (soft delete).
+ * @param[in] db Pointer to the `Database` structure.
+ * @param[in] task_id The ID of the task to be moved to the trash.
+ * @return `ORDO_OK` on success.
  */
 OrdoResult database_remove_task(Database *db, int task_id);
 
 /**
- * @brief Restaura uma tarefa da lixeira.
- * @param[in] db Ponteiro para a estrutura `Database`.
- * @param[in] task_id O ID da tarefa a ser restaurada.
- * @return `ORDO_OK` em caso de sucesso.
+ * @brief Restores a task from the trash.
+ * @param[in] db Pointer to the `Database` structure.
+ * @param[in] task_id The ID of the task to be restored.
+ * @return `ORDO_OK` on success.
  */
 OrdoResult database_restore_task(Database *db, int task_id);
 
 /**
- * @brief Deleta permanentemente uma tarefa do banco de dados.
- * @param[in] db Ponteiro para a estrutura `Database`.
- * @param[in] task_id O ID da tarefa a ser deletada permanentemente.
- * @return `ORDO_OK` em caso de sucesso.
+ * @brief Permanently deletes a task from the database.
+ * @param[in] db Pointer to the `Database` structure.
+ * @param[in] task_id The ID of the task to be permanently deleted.
+ * @return `ORDO_OK` on success.
  */
 OrdoResult database_permanently_delete_task(Database *db, int task_id);
 
 /**
- * @brief Alterna o estado de uma tarefa entre concluída e pendente.
- * @param[in] db Ponteiro para a estrutura `Database`.
- * @param[in] task_id O ID da tarefa a ser modificada.
- * @param[in] current_status O estado atual da tarefa (0 para pendente, 1 para concluída).
- * @return `ORDO_OK` em caso de sucesso.
+ * @brief Toggles the status of a task between completed and pending.
+ * @param[in] db Pointer to the `Database` structure.
+ * @param[in] task_id The ID of the task to be modified.
+ * @param[in] current_status The current status of the task (0 for pending, 1 for completed).
+ * @return `ORDO_OK` on success.
  */
 OrdoResult database_toggle_task_status(Database *db, int task_id,
                                        int current_status);
 
 /**
- * @brief Atualiza a descrição de uma tarefa existente.
- * @param[in] db Ponteiro para a estrutura `Database`.
- * @param[in] task_id O ID da tarefa a ser atualizada.
- * @param[in] new_description A nova descrição para a tarefa.
- * @return `ORDO_OK` em caso de sucesso.
+ * @brief Updates the description of an existing task.
+ * @param[in] db Pointer to the `Database` structure.
+ * @param[in] task_id The ID of the task to be updated.
+ * @param[in] new_description The new description for the task.
+ * @return `ORDO_OK` on success.
  */
 OrdoResult database_update_task_description(Database *db, int task_id,
                                             const char *new_description);

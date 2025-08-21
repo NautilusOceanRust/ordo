@@ -1,9 +1,9 @@
 /**
  * @file task_list.h
- * @brief Define uma estrutura de dados de lista dinâmica para gerenciar tarefas.
+ * @brief Defines a dynamic list data structure for managing tasks.
  *
- * Este módulo fornece uma abstração de uma lista de tarefas que pode crescer
- * dinamicamente, evitando o gerenciamento manual de memória no resto da aplicação.
+ * This module provides an abstraction of a task list that can grow
+ * dynamically, avoiding manual memory management in the rest of the application.
  */
 
 #ifndef TASK_LIST_H
@@ -14,55 +14,55 @@
 
 /**
  * @struct TaskList
- * @brief Estrutura para encapsular uma lista dinâmica de tarefas.
+ * @brief Structure to encapsulate a dynamic list of tasks.
  */
 typedef struct {
-    Tarefa *tasks;      /**< Ponteiro para o array de tarefas alocado dinamicamente. */
-    int count;          /**< O número atual de tarefas na lista. */
-    int capacity;       /**< A capacidade atual do array de tarefas. */
+    Task *tasks;      /**< Pointer to the dynamically allocated array of tasks. */
+    int count;          /**< The current number of tasks in the list. */
+    int capacity;       /**< The current capacity of the task array. */
 } TaskList;
 
-// --- Funções de Ciclo de Vida ---
+// --- Lifecycle Functions ---
 
 /**
- * @brief Inicializa uma nova lista de tarefas.
+ * @brief Initializes a new task list.
  *
- * Aloca a memória inicial para a lista de tarefas.
- * @param[out] list Ponteiro para a `TaskList` a ser inicializada.
+ * Allocates the initial memory for the task list.
+ * @param[out] list Pointer to the `TaskList` to be initialized.
  */
 void task_list_init(TaskList *list);
 
 /**
- * @brief Libera a memória alocada pela lista de tarefas.
- * @param[in] list Ponteiro para a `TaskList` a ser liberada.
+ * @brief Frees the memory allocated by the task list.
+ * @param[in] list Pointer to the `TaskList` to be freed.
  */
 void task_list_free(TaskList *list);
 
-// --- Funções de Manipulação ---
+// --- Manipulation Functions ---
 
 /**
- * @brief Adiciona uma cópia de uma tarefa à lista.
+ * @brief Adds a copy of a task to the list.
  *
- * A função gerencia a realocação de memória se a capacidade atual for excedida.
- * @param[in,out] list Ponteiro para a `TaskList`.
- * @param[in] task Ponteiro para a tarefa a ser adicionada. Uma cópia será feita.
- * @return `true` se a tarefa foi adicionada com sucesso, `false` se a realocação de memória falhar.
+ * The function manages memory reallocation if the current capacity is exceeded.
+ * @param[in,out] list Pointer to the `TaskList`.
+ * @param[in] task Pointer to the task to be added. A copy will be made.
+ * @return `true` if the task was added successfully, `false` if memory reallocation fails.
  */
-bool task_list_add(TaskList *list, const Tarefa *task);
+bool task_list_add(TaskList *list, const Task *task);
 
 /**
- * @brief Remove uma tarefa da lista com base em seu índice.
- * @param[in,out] list Ponteiro para a `TaskList`.
- * @param[in] index O índice da tarefa a ser removida.
+ * @brief Removes a task from the list based on its index.
+ * @param[in,out] list Pointer to the `TaskList`.
+ * @param[in] index The index of the task to be removed.
  */
 void task_list_remove(TaskList *list, int index);
 
 /**
- * @brief Limpa a lista de tarefas.
+ * @brief Clears the task list.
  *
- * Redefine a contagem de tarefas para zero, mas não libera a memória alocada,
- * permitindo a reutilização.
- * @param[in,out] list Ponteiro para a `TaskList` a ser limpa.
+ * Resets the task count to zero, but does not free the allocated memory,
+ * allowing for reuse.
+ * @param[in,out] list Pointer to the `TaskList` to be cleared.
  */
 void task_list_clear(TaskList *list); 
 

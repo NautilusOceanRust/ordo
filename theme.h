@@ -3,8 +3,8 @@
 
 #include <ncurses.h>
 
-// Define a estrutura de um tema de cores.
-// As cores sao as do ncurses (COLOR_RED, COLOR_BLUE, etc.).
+// Defines the structure of a color theme.
+// The colors are ncurses colors (COLOR_RED, COLOR_BLUE, etc.).
 typedef struct {
   const char *name;
   short header_fg;
@@ -23,18 +23,18 @@ typedef struct {
   short task_pending_bg;
 } OrdoTheme;
 
-// Declaração do array global de temas.
+// Declaration of the global themes array.
 extern const OrdoTheme ordo_themes[];
-// Número total de temas disponíveis.
+// Total number of available themes.
 extern const int num_ordo_themes;
 
-// Encontra um tema pelo nome. Retorna NULL se não for encontrado.
+// Finds a theme by name. Returns NULL if not found.
 const OrdoTheme *theme_get_by_name(const char *name);
 
-// Carrega temas de um diretorio externo.
+// Loads themes from an external directory.
 void theme_load_external();
 
-// Libera a memoria usada pelos temas externos.
+// Frees the memory used by external themes.
 void theme_free_external();
 
 #endif // THEME_H

@@ -1,28 +1,28 @@
 #ifndef I18N_H
 #define I18N_H
 
-// Interface para o sistema de internacionalização (i18n).
+// Interface for the internationalization (i18n) system.
 
 /**
- * @brief Carrega as traduções do arquivo .lang apropriado.
- * Tenta detectar o idioma do sistema. Se não encontrar um arquivo de tradução,
- * usa 'en.lang' como padrão.
+ * @brief Loads translations from the appropriate .lang file.
+ * Tries to detect the system language. If a translation file is not found,
+ * it defaults to 'en.lang'.
  */
 void i18n_init(const char *initial_lang);
 void i18n_load_language(const char *lang);
 
 /**
- * @brief Libera a memória alocada para as traduções.
- * Deve ser chamada no final do programa.
+ * @brief Frees the memory allocated for translations.
+ * Should be called at the end of the program.
  */
 void i18n_destroy();
 
 /**
- * @brief Obtém a string de tradução para uma determinada chave.
+ * @brief Gets the translation string for a given key.
  *
- * @param key A chave da tradução (ex: "MENU_ADD").
- * @return const char* A string traduzida ou a própria chave se não for
- * encontrada.
+ * @param key The translation key (e.g., "MENU_ADD").
+ * @return const char* The translated string or the key itself if not
+ * found.
  */
 const char *get_translation(const char *key);
 

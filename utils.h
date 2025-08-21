@@ -4,25 +4,25 @@
 #include <stdlib.h>
 #include <stddef.h>
 
-// --- Gerenciamento de Memória Automático (Estilo Smart Pointer) ---
-// Atributo do GCC/Clang para chamar uma função de limpeza quando a variável sai do escopo.
-// Isso ajuda a evitar vazamentos de memória, garantindo que `free` seja chamado.
+// --- Automatic Memory Management (Smart Pointer Style) ---
+// GCC/Clang attribute to call a cleanup function when the variable goes out of scope.
+// This helps prevent memory leaks by ensuring `free` is called.
 
-// Função de limpeza que libera a memória apontada por um ponteiro.
+// Cleanup function that frees the memory pointed to by a pointer.
 static inline void auto_free(void *p) {
   free(*(void**)p);
 }
 
-// Macro para definir uma variável de ponteiro que será liberada automaticamente.
+// Macro to define a pointer variable that will be automatically freed.
 #define auto_free_ptr __attribute__((cleanup(auto_free)))
 
-// --- Declarações de Funções Utilitárias ---
+// --- Utility Function Declarations ---
 
 #define NOME_APLICACAO "ordo"
 #define NOME_BANCO_DE_DADOS "tasks.db"
 #define MAX_PATH 4096
 
-// Funções de manipulação de strings e caminhos
+// String and path manipulation functions
 void truncar_por_largura(char *dest, size_t dest_size, const char *src,
                          int max_width);
 int obterCaminhoBancoDeDados(char *buffer, size_t tamanho_buffer);
@@ -33,7 +33,7 @@ void generate_line(char *buffer, size_t buffer_size, const char *ch,
                    int length);
 int str_width(const char *str);
 
-// --- Funções seguras para manipulação de strings e memória ---
+// --- Safe string and memory manipulation functions ---
 #include <stdarg.h>
 #include <string.h>
 

@@ -21,10 +21,10 @@
 #endif
 
 /**
- * @brief Remove espaços em branco do início e do fim de uma string (UTF-8 safe).
- * @param str A string de entrada (constante).
- * @return Uma nova string alocada com o resultado, ou NULL se a alocação
- * falhar. O chamador deve liberar a memória retornada.
+ * @brief Removes whitespace from the beginning and end of a string (UTF-8 safe).
+ * @param str The input string (constant).
+ * @return A newly allocated string with the result, or NULL if allocation fails.
+ * The caller must free the returned memory.
  */
 char *trim(const char *str) {
   if (!str)
@@ -62,7 +62,7 @@ char *trim(const char *str) {
   if (!trimmed_str) {
     free(w_str);
     free(w_trimmed);
-    return NULL; // Retorna em caso de falha de alocação
+    return NULL; // Return in case of allocation failure
   }
 
   wcstombs(trimmed_str, w_trimmed, mb_len + 1);
@@ -73,7 +73,7 @@ char *trim(const char *str) {
   return trimmed_str;
 }
 
-void truncar_por_largura(char *dest, size_t dest_size, const char *src,
+void truncate_by_width(char *dest, size_t dest_size, const char *src,
                          int max_width) {
   if (dest_size == 0)
     return;
@@ -82,23 +82,23 @@ void truncar_por_largura(char *dest, size_t dest_size, const char *src,
   const wchar_t *ellipsis = L"...";
   size_t src_len = strlen(src);
 
-  // Aloca espaço para a string + elipse + terminador nulo
+  // Allocates space for the string + ellipsis + null terminator
   wchar_t *w_src = malloc((src_len + wcslen(ellipsis) + 1) * sizeof(wchar_t));
   if (!w_src) {
     return;
-  } // Falha de alocação
+  } // Allocation failure
   mbstowcs(w_src, src, src_len + 1);
 
   int total_width = wcswidth(w_src, -1);
 
-  // Se a string já cabe, apenas copie
+  // If the string already fits, just copy it
   if (total_width <= max_width) {
     safe_snprintf(dest, dest_size, "%s", src);
     free(w_src);
     return;
   }
 
-  // Trunca e adiciona elipse
+  // Truncates and adds ellipsis
   int ellipsis_width = wcswidth(ellipsis, -1);
   int target_width = max_width - ellipsis_width;
   if (target_width < 0)
@@ -118,49 +118,49 @@ void truncar_por_largura(char *dest, size_t dest_size, const char *src,
     end_index++;
   }
 
-  // Constrói a string final truncada com elipse
-  w_src[end_index] = L'\0'; // Trunca a string wide
-  wcscat(w_src, ellipsis);  // Adiciona a elipse
+  // Builds the final truncated string with ellipsis
+  w_src[end_index] = L'\0'; // Truncates the wide string
+  wcscat(w_src, ellipsis);  // Adds the ellipsis
 
-  // Converte de volta para multibyte (UTF-8) e copia para o destino
+  // Converts back to multibyte (UTF-8) and copies to the destination
   wcstombs(dest, w_src, dest_size);
   dest[dest_size - 1] = '\0';
 
   free(w_src);
 }
 
-int obterCaminhoBancoDeDados(char *buffer, size_t tamanho_buffer) {
-  char *caminho_app = platform_get_config_dir();
-  if (!caminho_app) {
-    fprintf(stderr, "Erro: Nao foi possivel obter o diretorio de configuracao.\n");
+int getDatabasePath(char *buffer, size_t buffer_size) {
+  char *app_path = platform_get_config_dir();
+  if (!app_path) {
+    fprintf(stderr, "Error: Could not get the configuration directory.\n");
     return 1;
   }
 
 
-  if (!platform_create_dir_recursive(caminho_app)) {
-    fprintf(stderr, "Erro ao criar diretorio '%s': %s\n", caminho_app,
+  if (!platform_create_dir_recursive(app_path)) {
+    fprintf(stderr, "Error creating directory '%s': %s\n", app_path,
             strerror(errno));
-    free(caminho_app);
+    free(app_path);
     return 1;
   }
 
 
-  char *db_path = path_join(caminho_app, NOME_BANCO_DE_DADOS);
-  free(caminho_app);
+  char *db_path = path_join(app_path, DATABASE_NAME);
+  free(app_path);
 
   if (!db_path) {
-      fprintf(stderr, "Erro ao construir o caminho para o banco de dados.\n");
+      fprintf(stderr, "Error building the path to the database.\n");
       return 1;
   }
 
   size_t db_path_len = strlen(db_path);
-  if (db_path_len >= tamanho_buffer) {
-      fprintf(stderr, "Erro: O caminho para o banco de dados e muito longo.\n");
+  if (db_path_len >= buffer_size) {
+      fprintf(stderr, "Error: The path to the database is too long.\n");
       free(db_path);
       return 1;
   }
 
-  safe_snprintf(buffer, tamanho_buffer, "%s", db_path);
+  safe_snprintf(buffer, buffer_size, "%s", db_path);
   
   free(db_path);
   return 0;
@@ -176,7 +176,7 @@ char *word_wrap(const char *src, int max_width) {
     return NULL;
   mbstowcs(w_src, src, src_len + 1);
 
-  // Aloca um buffer de resultado que é certamente grande o suficiente
+  // Allocates a result buffer that is certainly large enough
   wchar_t *w_dest = malloc((wcslen(w_src) * 2 + 1) * sizeof(wchar_t));
   if (!w_dest) {
     free(w_src);
@@ -189,7 +189,7 @@ char *word_wrap(const char *src, int max_width) {
   int current_width = 0;
 
   while (*p) {
-    // Encontra o fim da próxima palavra ou o fim da string
+    // Finds the end of the next word or the end of the string
     wchar_t *word_end = p;
     int word_width = 0;
     while (*word_end && !iswspace(*word_end)) {
@@ -197,7 +197,7 @@ char *word_wrap(const char *src, int max_width) {
       word_end++;
     }
 
-    // Se a palavra em si for maior que a largura da linha, quebre-a
+    // If the word itself is larger than the line width, break it
     if (word_width > max_width) {
       if (current_width > 0) {
         wcscat(w_dest, L"\n");
@@ -215,23 +215,23 @@ char *word_wrap(const char *src, int max_width) {
         char_p++;
       }
       p = word_end;
-      current_width = 0; // A proxima palavra comeca em uma nova linha
+      current_width = 0; // The next word starts on a new line
       line_start = p;
-      // Adiciona espaco se houver
+      // Adds space if there is any
       while (*p && iswspace(*p)) {
         p++;
       }
       continue;
     }
 
-    // Verifica se a palavra cabe na linha atual
+    // Checks if the word fits on the current line
     if (current_width + (p == line_start ? 0 : 1) + word_width > max_width) {
       wcscat(w_dest, L"\n");
       current_width = 0;
       line_start = p;
     }
 
-    // Adiciona a palavra ao resultado
+    // Adds the word to the result
     if (current_width > 0) {
       wcscat(w_dest, L" ");
       current_width++;
@@ -241,7 +241,7 @@ char *word_wrap(const char *src, int max_width) {
     current_width += word_width;
     p = word_end;
 
-    // Pula os espacos em branco
+    // Skips the whitespace
     while (*p && iswspace(*p)) {
       p++;
     }
@@ -249,7 +249,7 @@ char *word_wrap(const char *src, int max_width) {
 
   free(w_src);
 
-  // Converte a string wide resultante de volta para multibyte
+  // Converts the resulting wide string back to multibyte
   size_t dest_len = wcstombs(NULL, w_dest, 0);
   char *dest = malloc(dest_len + 1);
   if (dest) {
@@ -273,20 +273,20 @@ char *path_join(const char *base, const char *leaf) {
     size_t base_len = strlen(base);
     size_t leaf_len = strlen(leaf);
 
-    // Remove a barra final da base, se houver
+    // Removes the final slash from the base, if any
     if (base_len > 0 && base[base_len - 1] == separator) {
         base_len--;
     }
 
-    // Calcula o tamanho total e aloca memória
-    size_t total_len = base_len + 1 + leaf_len + 1; // +1 para a barra, +1 para o nulo
+    // Calculates the total size and allocates memory
+    size_t total_len = base_len + 1 + leaf_len + 1; // +1 for the slash, +1 for the null
     char *result = malloc(total_len);
     if (!result) return NULL;
 
-    // Constrói o caminho final
+    // Builds the final path
     safe_memcpy(result, base, base_len);
     result[base_len] = separator;
-    safe_memcpy(result + base_len + 1, leaf, leaf_len + 1); // +1 para copiar o nulo
+    safe_memcpy(result + base_len + 1, leaf, leaf_len + 1); // +1 to copy the null
 
     return result;
 }

@@ -4,10 +4,10 @@
 #include "task.h"
 #include <stdbool.h>
 
-// Forward declaration para evitar dependência circular
+// Forward declaration to avoid circular dependency
 struct AppState;
 
-// Define os tipos de ações que podem ser desfeitas
+// Defines the types of actions that can be undone
 typedef enum {
   ACTION_ADD,
   ACTION_DELETE,
@@ -15,7 +15,7 @@ typedef enum {
   ACTION_TOGGLE
 } ActionType;
 
-// Estrutura que armazena uma única ação para o histórico
+// Structure that stores a single action for the history
 typedef struct {
   ActionType type;
   int task_id;
@@ -26,7 +26,7 @@ typedef struct {
 
 #define UNDO_STACK_SIZE 10
 
-// Estrutura que gerencia as pilhas de undo e redo
+// Structure that manages the undo and redo stacks
 typedef struct {
   Command undo_stack[UNDO_STACK_SIZE];
   int undo_top;
@@ -34,7 +34,7 @@ typedef struct {
   int redo_top;
 } UndoManager;
 
-// --- Funções Públicas ---
+// --- Public Functions ---
 void undo_manager_init(UndoManager *manager);
 void undo_manager_push(UndoManager *manager, ActionType type, int task_id,
                        const char *old_data, const char *new_data,

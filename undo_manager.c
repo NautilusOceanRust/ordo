@@ -1,14 +1,14 @@
 #include "undo_manager.h"
-#include "app.h" // Para acesso ao banco de dados
+#include "app.h" // For database access
 #include "error.h"
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
 
-// Função auxiliar interna para empurrar um comando para uma pilha
+// Internal helper function to push a command onto a stack
 static void push_command(Command *stack, int *top, const Command *cmd) {
   if (*top >= UNDO_STACK_SIZE - 1) {
-    // Se a pilha estiver cheia, descarta o item mais antigo
+    // If the stack is full, discard the oldest item
     safe_memmove(&stack[0], &stack[1], (UNDO_STACK_SIZE - 1) * sizeof(Command));
     *top = UNDO_STACK_SIZE - 2;
   }
@@ -77,7 +77,7 @@ bool undo_manager_perform_undo(UndoManager *manager, AppState *app) {
     return true;
   }
 
-  // Se a operação falhar, restaura o comando na pilha de undo
+  // If the operation fails, restore the command to the undo stack
   manager->undo_top++;
   return false;
 }
@@ -111,7 +111,7 @@ bool undo_manager_perform_redo(UndoManager *manager, AppState *app) {
     return true;
   }
 
-  // Se a operação falhar, restaura o comando na pilha de redo
+  // If the operation fails, restore the command to the redo stack
   manager->redo_top++;
   return false;
 }

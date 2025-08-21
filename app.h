@@ -1,9 +1,9 @@
 /**
  * @file app.h
- * @brief Declarações centrais para o estado e ciclo de vida da aplicação Ordo.
+ * @brief Central declarations for the Ordo application state and lifecycle.
  *
- * Este arquivo define a estrutura principal `AppState` que encapsula todo o estado
- * da aplicação, bem como as funções para inicializar e destruir a aplicação.
+ * This file defines the main `AppState` structure that encapsulates the entire
+ * state of the application, as well as the functions to initialize and destroy the application.
  */
 
 #ifndef APP_H
@@ -18,54 +18,54 @@
 
 /**
  * @enum AppView
- * @brief Enum para controlar a visão (tela) atualmente exibida na UI.
+ * @brief Enum to control the view (screen) currently displayed in the UI.
  */
 typedef enum {
-  VIEW_MAIN,  /**< A visão principal, mostrando tarefas ativas. */
-  VIEW_TRASH  /**< A visão da lixeira, mostrando tarefas removidas. */
+  VIEW_MAIN,  /**< The main view, showing active tasks. */
+  VIEW_TRASH  /**< The trash view, showing removed tasks. */
 } AppView;
 
 /**
  * @struct AppState
- * @brief Estrutura central que contém todo o estado da aplicação.
+ * @brief Central structure that contains the entire state of the application.
  *
- * Esta estrutura agrega todos os componentes principais da aplicação, como
- * o manipulador de banco de dados, configurações, listas de tarefas e o estado da UI.
+ * This structure aggregates all the main components of the application, such as
+ * the database handler, settings, task lists, and UI state.
  */
 typedef struct AppState {
-  Database db;                  /**< Manipulador do banco de dados. */
-  AppConfig config;             /**< Configurações da aplicação (tema, idioma). */
-  TaskList task_list;           /**< A lista de tarefas atualmente exibida. */
-  UndoManager undo_manager;     /**< Gerenciador para ações de desfazer/refazer. */
+  Database db;                  /**< Database handler. */
+  AppConfig config;             /**< Application settings (theme, language). */
+  TaskList task_list;           /**< The currently displayed task list. */
+  UndoManager undo_manager;     /**< Manager for undo/redo actions. */
 
-  AppView current_view;         /**< A visão (tela) atual. */
-  int current_selection;        /**< O índice da tarefa atualmente selecionada. */
-  int scroll_offset;            /**< O deslocamento da rolagem na lista de tarefas. */
+  AppView current_view;         /**< The current view (screen). */
+  int current_selection;        /**< The index of the currently selected task. */
+  int scroll_offset;            /**< The scroll offset in the task list. */
 
-  bool should_exit;             /**< Flag para sinalizar o término da aplicação. */
-  bool refresh_tasks;           /**< Flag para sinalizar a necessidade de recarregar as tarefas do DB. */
+  bool should_exit;             /**< Flag to signal the end of the application. */
+  bool refresh_tasks;           /**< Flag to signal the need to reload tasks from the DB. */
 } AppState;
 
-// --- Funções de Ciclo de Vida ---
+// --- Lifecycle Functions ---
 
 /**
- * @brief Inicializa a aplicação.
+ * @brief Initializes the application.
  *
- * Configura o locale, inicializa o banco de dados, a UI, o gerenciador de
- * internacionalização e carrega as configurações.
+ * Sets up the locale, initializes the database, the UI, the internationalization
+ * manager, and loads the settings.
  *
- * @param[out] app Ponteiro para a estrutura AppState a ser inicializada.
- * @return `true` se a inicialização for bem-sucedida, `false` caso contrário.
+ * @param[out] app Pointer to the AppState structure to be initialized.
+ * @return `true` if initialization is successful, `false` otherwise.
  */
 bool app_init(AppState *app);
 
 /**
- * @brief Libera todos os recursos alocados pela aplicação.
+ * @brief Frees all resources allocated by the application.
  *
- * Fecha a UI, o banco de dados e libera a memória usada pela lista de tarefas
- * e outros componentes.
+ * Closes the UI, the database, and frees the memory used by the task list
+ * and other components.
  *
- * @param[in] app Ponteiro para a estrutura AppState a ser destruída.
+ * @param[in] app Pointer to the AppState structure to be destroyed.
  */
 void app_destroy(AppState *app);
 
