@@ -124,7 +124,7 @@ static OrdoResult load_tasks_generic(sqlite3_stmt *select_stmt,
     const unsigned char *desc = sqlite3_column_text(select_stmt, 1);
     // Safely copy the description to the task structure.
     if (desc) {
-      snprintf(task.descricao, MAX_DESCRICAO, "%s", (const char *)desc);
+      safe_snprintf(task.descricao, MAX_DESCRICAO, "%s", (const char *)desc);
     } else {
       task.descricao[0] = '\0';
     }

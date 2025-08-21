@@ -26,43 +26,43 @@ void get_system_lang(char *lang_buf, size_t buf_size) {
   LANGID langID = GetUserDefaultUILanguage();
   switch (langID & 0xff) {
   case LANG_PORTUGUESE:
-    snprintf(lang_buf, buf_size, "pt");
+    safe_snprintf(lang_buf, buf_size, "pt");
     break;
   case LANG_ENGLISH:
-    snprintf(lang_buf, buf_size, "en");
+    safe_snprintf(lang_buf, buf_size, "en");
     break;
   case LANG_SPANISH:
-    snprintf(lang_buf, buf_size, "es");
+    safe_snprintf(lang_buf, buf_size, "es");
     break;
   case LANG_GERMAN:
-    snprintf(lang_buf, buf_size, "de");
+    safe_snprintf(lang_buf, buf_size, "de");
     break;
   case LANG_ITALIAN:
-    snprintf(lang_buf, buf_size, "it");
+    safe_snprintf(lang_buf, buf_size, "it");
     break;
   case LANG_JAPANESE:
-    snprintf(lang_buf, buf_size, "ja");
+    safe_snprintf(lang_buf, buf_size, "ja");
     break;
   case LANG_RUSSIAN:
-    snprintf(lang_buf, buf_size, "ru");
+    safe_snprintf(lang_buf, buf_size, "ru");
     break;
   default:
-    snprintf(lang_buf, buf_size, "en");
+    safe_snprintf(lang_buf, buf_size, "en");
     break;
   }
 #else
   const char *lang_env = getenv("LANG");
   if (lang_env && strlen(lang_env) >= 2) {
-    snprintf(lang_buf, 3, "%.2s", lang_env);
+    safe_snprintf(lang_buf, 3, "%.2s", lang_env);
   } else {
-    snprintf(lang_buf, buf_size, "en"); // Default
+    safe_snprintf(lang_buf, buf_size, "en"); // Default
   }
 #endif
 }
 
 void i18n_load_language(const char *lang) {
   char lang_filename[256];
-  int len = snprintf(lang_filename, sizeof(lang_filename), "%s.lang", lang);
+  int len = safe_snprintf(lang_filename, sizeof(lang_filename), "%s.lang", lang);
   if ((size_t)len >= sizeof(lang_filename)) {
     fprintf(stderr, "Error: lang string is too long.\n");
     return;

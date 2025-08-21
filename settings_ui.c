@@ -44,7 +44,7 @@ static WINDOW *draw_theme_preview_window(int starty, int startx,
   char str_buffer[256];
   char truncated_buffer[256];
 
-  snprintf(str_buffer, sizeof(str_buffer), "%s: %s",
+  safe_snprintf(str_buffer, sizeof(str_buffer), "%s: %s",
            get_translation("THEME_PREVIEW"), theme->name);
   truncar_por_largura(truncated_buffer, sizeof(truncated_buffer), str_buffer,
                       38);
@@ -57,14 +57,14 @@ static WINDOW *draw_theme_preview_window(int starty, int startx,
   wattroff(win, COLOR_PAIR(config->color_pair_header));
 
   wattron(win, COLOR_PAIR(config->color_pair_task_done));
-  snprintf(str_buffer, sizeof(str_buffer), "[x] %s",
+  safe_snprintf(str_buffer, sizeof(str_buffer), "[x] %s",
            get_translation("DONE_TASK"));
   mbstowcs(wide_buffer, str_buffer, 256);
   mvwaddwstr(win, 4, 4, wide_buffer);
   wattroff(win, COLOR_PAIR(config->color_pair_task_done));
 
   wattron(win, COLOR_PAIR(config->color_pair_task_pending));
-  snprintf(str_buffer, sizeof(str_buffer), "[ ] %s",
+  safe_snprintf(str_buffer, sizeof(str_buffer), "[ ] %s",
            get_translation("PENDING_TASK"));
   mbstowcs(wide_buffer, str_buffer, 256);
   mvwaddwstr(win, 5, 4, wide_buffer);
@@ -157,7 +157,7 @@ static void ui_settings_select_theme(AppConfig *config) {
       break;
     case '\n':
     case KEY_ENTER:
-      snprintf(config->theme_name, sizeof(config->theme_name), "%s", ordo_themes[current_selection].name);
+      safe_snprintf(config->theme_name, sizeof(config->theme_name), "%s", ordo_themes[current_selection].name);
       config_save(config);
       config_init_color_pairs(config);
       return;
@@ -277,7 +277,7 @@ static void ui_settings_select_language(AppConfig *config) {
       break;
     case '\n':
     case KEY_ENTER:
-      snprintf(config->lang, sizeof(config->lang), "%s", available_langs[current_selection]);
+      safe_snprintf(config->lang, sizeof(config->lang), "%s", available_langs[current_selection]);
       config_save(config);
       i18n_load_language(config->lang);
       for (int i = 0; i < lang_count; i++)
@@ -329,7 +329,7 @@ void settings_ui_show(AppConfig *config) {
       }
 
       char str_buffer[256];
-      snprintf(str_buffer, sizeof(str_buffer), "%d. %s", i + 1,
+      safe_snprintf(str_buffer, sizeof(str_buffer), "%d. %s", i + 1,
                get_translation(options[i]));
 
       char truncated_buffer[256];

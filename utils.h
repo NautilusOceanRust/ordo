@@ -33,4 +33,12 @@ void generate_line(char *buffer, size_t buffer_size, const char *ch,
                    int length);
 int str_width(const char *str);
 
+// --- Funções seguras para manipulação de strings e memória ---
+#include <stdarg.h>
+#include <string.h>
+
+int safe_snprintf(char *str, size_t size, const char *format, ...);
+void *safe_memcpy(void *dest, const void *src, size_t n);
+void *safe_memmove(void *dest, const void *src, size_t n);
+
 #endif // UTILS_H

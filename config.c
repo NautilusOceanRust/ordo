@@ -40,8 +40,8 @@ void set_default_config(AppConfig *config) {
   config->color_pair_success = DEFAULT_COLOR_SUCCESS_PAIR;
   config->color_pair_task_done = DEFAULT_COLOR_TASK_DONE_PAIR;
   config->color_pair_task_pending = DEFAULT_COLOR_TASK_PENDING_PAIR;
-  snprintf(config->lang, sizeof(config->lang), "en");
-  snprintf(config->theme_name, sizeof(config->theme_name), "Ordo Classic");
+  safe_snprintf(config->lang, sizeof(config->lang), "en");
+  safe_snprintf(config->theme_name, sizeof(config->theme_name), "Ordo Classic");
 }
 
 // Function to create the configuration file with default values
@@ -106,9 +106,9 @@ void config_load(AppConfig *config) {
 
       if (trimmed_key && trimmed_value) {
         if (strcmp(trimmed_key, "lang") == 0) {
-          snprintf(config->lang, sizeof(config->lang), "%s", trimmed_value);
+          safe_snprintf(config->lang, sizeof(config->lang), "%s", trimmed_value);
         } else if (strcmp(trimmed_key, "theme") == 0) {
-          snprintf(config->theme_name, sizeof(config->theme_name), "%s",
+          safe_snprintf(config->theme_name, sizeof(config->theme_name), "%s",
                    trimmed_value);
         }
       }

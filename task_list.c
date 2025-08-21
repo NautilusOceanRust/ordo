@@ -1,4 +1,5 @@
 #include "task_list.h"
+#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,7 +39,7 @@ bool task_list_add(TaskList *list, const Tarefa *task) {
     // Copia os dados da tarefa para a lista.
     list->tasks[list->count].id = task->id;
     list->tasks[list->count].concluida = task->concluida;
-    snprintf(list->tasks[list->count].descricao, MAX_DESCRICAO, "%s", task->descricao);
+    safe_snprintf(list->tasks[list->count].descricao, MAX_DESCRICAO, "%s", task->descricao);
 
     list->count++;
     return true;
@@ -51,7 +52,7 @@ void task_list_remove(TaskList *list, int index) {
 
     // Move as tarefas subsequentes para preencher o espaço.
     if (index < list->count - 1) {
-        memmove(&list->tasks[index], &list->tasks[index + 1], (list->count - index - 1) * sizeof(Tarefa));
+        safe_memmove(&list->tasks[index], &list->tasks[index + 1], (list->count - index - 1) * sizeof(Tarefa));
     }
 
     list->count--;

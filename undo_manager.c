@@ -1,6 +1,7 @@
 #include "undo_manager.h"
 #include "app.h" // Para acesso ao banco de dados
 #include "error.h"
+#include "utils.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -8,7 +9,7 @@
 static void push_command(Command *stack, int *top, const Command *cmd) {
   if (*top >= UNDO_STACK_SIZE - 1) {
     // Se a pilha estiver cheia, descarta o item mais antigo
-    memmove(&stack[0], &stack[1], (UNDO_STACK_SIZE - 1) * sizeof(Command));
+    safe_memmove(&stack[0], &stack[1], (UNDO_STACK_SIZE - 1) * sizeof(Command));
     *top = UNDO_STACK_SIZE - 2;
   }
   (*top)++;
@@ -29,13 +30,13 @@ void undo_manager_push(UndoManager *manager, ActionType type, int task_id,
   cmd.old_state = old_state;
 
   if (old_data) {
-    snprintf(cmd.old_data, MAX_DESCRICAO, "%s", old_data);
+    safe_snprintf(cmd.old_data, MAX_DESCRICAO, "%s", old_data);
   } else {
     cmd.old_data[0] = '\0';
   }
 
   if (new_data) {
-    snprintf(cmd.new_data, MAX_DESCRICAO, "%s", new_data);
+    safe_snprintf(cmd.new_data, MAX_DESCRICAO, "%s", new_data);
   } else {
     cmd.new_data[0] = '\0';
   }

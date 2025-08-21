@@ -80,7 +80,7 @@ void ui_display_menu(WINDOW *win, const AppConfig *config,
         "MENU_TRASH",  "MENU_EXIT"};
     const char *keys[] = {"1", "2", "3", "4", "5", "6", "u", "y", "t", "7"};
     for (size_t i = 0; i < sizeof(menu_items) / sizeof(menu_items[0]); ++i) {
-      int len = snprintf(str_buffer, sizeof(str_buffer), "[%s] %s", keys[i],
+      int len = safe_snprintf(str_buffer, sizeof(str_buffer), "[%s] %s", keys[i],
                get_translation(menu_items[i]));
       if ((size_t)len >= sizeof(str_buffer)) {
         // Handle error
@@ -95,7 +95,7 @@ void ui_display_menu(WINDOW *win, const AppConfig *config,
                                 "MENU_BACK"};
     const char *keys[] = {"r", "d", "q"};
     for (size_t i = 0; i < sizeof(menu_items) / sizeof(menu_items[0]); ++i) {
-      int len = snprintf(str_buffer, sizeof(str_buffer), "[%s] %s", keys[i],
+      int len = safe_snprintf(str_buffer, sizeof(str_buffer), "[%s] %s", keys[i],
                get_translation(menu_items[i]));
       if ((size_t)len >= sizeof(str_buffer)) {
         // Handle error
@@ -152,7 +152,7 @@ void ui_display_tasks(WINDOW *win, const Tarefa *tasks, int num_tasks,
 
       const char *status_icon = tasks[task_index].concluida ? "✔" : "○";
       char task_line[win_w];
-      snprintf(task_line, sizeof(task_line), " %s %s", status_icon,
+      safe_snprintf(task_line, sizeof(task_line), " %s %s", status_icon,
                tasks[task_index].descricao);
       char truncated_line[win_w];
       truncar_por_largura(truncated_line, sizeof(truncated_line), task_line,
@@ -273,7 +273,7 @@ static void draw_text_input(TextInputState *state) {
 
   // Desenha o contador de caracteres
   char counter[32];
-  snprintf(counter, sizeof(counter), "[%d/%d]", state->len, state->buffer_size - 1);
+  safe_snprintf(counter, sizeof(counter), "[%d/%d]", state->len, state->buffer_size - 1);
   mvwprintw(state->win, state->win_h - 2, state->win_w - strlen(counter) - 2, "%s", counter);
 
   // Posiciona o cursor
@@ -325,20 +325,20 @@ static bool handle_text_input(TextInputState *state, wint_t ch) {
   case KEY_BACKSPACE:
   case 127:
     if (state->cursor_pos > 0) {
-      memmove(&state->buffer[state->cursor_pos - 1], &state->buffer[state->cursor_pos], (state->len - state->cursor_pos + 1) * sizeof(wchar_t));
+      safe_memmove(&state->buffer[state->cursor_pos - 1], &state->buffer[state->cursor_pos], (state->len - state->cursor_pos + 1) * sizeof(wchar_t));
       state->cursor_pos--;
     }
     break;
   case KEY_DC: // Delete
     if (state->cursor_pos < state->len) {
-      memmove(&state->buffer[state->cursor_pos], &state->buffer[state->cursor_pos + 1], (state->len - state->cursor_pos) * sizeof(wchar_t));
+      safe_memmove(&state->buffer[state->cursor_pos], &state->buffer[state->cursor_pos + 1], (state->len - state->cursor_pos) * sizeof(wchar_t));
     }
     break;
   case KEY_CTRL_BACKSPACE:
   {
     int prev_word_start = find_prev_word_start(state->buffer, state->cursor_pos);
     if (prev_word_start < state->cursor_pos) {
-      memmove(&state->buffer[prev_word_start], &state->buffer[state->cursor_pos], (state->len - state->cursor_pos + 1) * sizeof(wchar_t));
+      safe_memmove(&state->buffer[prev_word_start], &state->buffer[state->cursor_pos], (state->len - state->cursor_pos + 1) * sizeof(wchar_t));
       state->cursor_pos = prev_word_start;
     }
     break;
@@ -346,7 +346,7 @@ static bool handle_text_input(TextInputState *state, wint_t ch) {
   default:
     // Inserir caractere
     if (iswprint(ch) && state->len < state->buffer_size - 1) {
-      memmove(&state->buffer[state->cursor_pos + 1], &state->buffer[state->cursor_pos], (state->len - state->cursor_pos + 1) * sizeof(wchar_t));
+      safe_memmove(&state->buffer[state->cursor_pos + 1], &state->buffer[state->cursor_pos], (state->len - state->cursor_pos + 1) * sizeof(wchar_t));
       state->buffer[state->cursor_pos] = ch;
       state->cursor_pos++;
     }
@@ -474,10 +474,10 @@ void ui_display_full_task(const Tarefa *task, const AppConfig *config) {
   WINDOW *win = create_popup(win_h, win_w, "VIEW_TITLE");
 
   char buffer[100];
-  snprintf(buffer, sizeof(buffer), get_translation("VIEW_TASK_ID"), task->id);
+  safe_snprintf(buffer, sizeof(buffer), get_translation("VIEW_TASK_ID"), task->id);
   mvwprintw(win, 3, 2, "%s", buffer);
 
-  snprintf(buffer, sizeof(buffer), get_translation("VIEW_TASK_STATUS"),
+  safe_snprintf(buffer, sizeof(buffer), get_translation("VIEW_TASK_STATUS"),
             task->concluida ? get_translation("STATUS_DONE")
                             : get_translation("STATUS_PENDING"));
   mvwprintw(win, 4, 2, "%s", buffer);
@@ -511,7 +511,7 @@ void ui_display_clock(WINDOW *win, const char *time_string) {
 
   // Limpa a área do relógio para evitar sobreposição
   char empty_line[win_w];
-  int len = snprintf(empty_line, sizeof(empty_line), "%*s", win_w - 2, "");
+  int len = safe_snprintf(empty_line, sizeof(empty_line), "%*s", win_w - 2, "");
   if ((size_t)len >= sizeof(empty_line)) {
     // Handle error
   }

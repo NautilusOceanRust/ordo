@@ -93,7 +93,7 @@ void truncar_por_largura(char *dest, size_t dest_size, const char *src,
 
   // Se a string já cabe, apenas copie
   if (total_width <= max_width) {
-    snprintf(dest, dest_size, "%s", src);
+    safe_snprintf(dest, dest_size, "%s", src);
     free(w_src);
     return;
   }
@@ -160,7 +160,7 @@ int obterCaminhoBancoDeDados(char *buffer, size_t tamanho_buffer) {
       return 1;
   }
 
-  snprintf(buffer, tamanho_buffer, "%s", db_path);
+  safe_snprintf(buffer, tamanho_buffer, "%s", db_path);
   
   free(db_path);
   return 0;
@@ -265,7 +265,7 @@ char *path_join(const char *base, const char *leaf) {
 
     const char separator =
 #ifdef _WIN32
-        '\\';
+        '\';
 #else
         '/';
 #endif
@@ -284,10 +284,9 @@ char *path_join(const char *base, const char *leaf) {
     if (!result) return NULL;
 
     // Constrói o caminho final
-    memcpy(result, base, base_len);
+    safe_memcpy(result, base, base_len);
     result[base_len] = separator;
-    memcpy(result + base_len + 1, leaf, leaf_len + 1); // +1 para copiar o nulo
+    safe_memcpy(result + base_len + 1, leaf, leaf_len + 1); // +1 para copiar o nulo
 
     return result;
 }
-
