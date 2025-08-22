@@ -23,8 +23,8 @@ static inline void auto_free(void *p) {
 #define MAX_PATH 4096
 
 // String and path manipulation functions
-void truncar_por_largura(char *dest, size_t dest_size, const char *src,
-                         int max_width);
+void truncate_by_width(char *dest, size_t dest_size, const char *src,
+			 int max_width);
 int obterCaminhoBancoDeDados(char *buffer, size_t tamanho_buffer);
 char *trim(const char *str);
 char *word_wrap(const char *src, int max_width);

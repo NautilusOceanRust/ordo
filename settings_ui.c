@@ -46,7 +46,7 @@ static WINDOW *draw_theme_preview_window(int starty, int startx,
 
   safe_snprintf(str_buffer, sizeof(str_buffer), "%s: %s",
            get_translation("THEME_PREVIEW"), theme->name);
-  truncar_por_largura(truncated_buffer, sizeof(truncated_buffer), str_buffer,
+  truncate_by_width(truncated_buffer, sizeof(truncated_buffer), str_buffer,
                       38);
   mbstowcs(wide_buffer, truncated_buffer, 256);
   mvwaddwstr(win, 1, 2, wide_buffer);
@@ -132,7 +132,7 @@ static void ui_settings_select_theme(AppConfig *config) {
       int theme_index = scroll_offset + i;
       if (theme_index == current_selection)
         attron(A_REVERSE);
-      truncar_por_largura(truncated_buffer, sizeof(truncated_buffer),
+      truncate_by_width(truncated_buffer, sizeof(truncated_buffer),
                           ordo_themes[theme_index].name, max_name_len);
       mvprintw(list_start_y + i, list_start_x, " %s ", truncated_buffer);
       if (theme_index == current_selection)
@@ -333,7 +333,7 @@ void settings_ui_show(AppConfig *config) {
                get_translation(options[i]));
 
       char truncated_buffer[256];
-      truncar_por_largura(truncated_buffer, sizeof(truncated_buffer),
+      truncate_by_width(truncated_buffer, sizeof(truncated_buffer),
                           str_buffer, win_w - x * 2);
       mbstowcs(wide_buffer, truncated_buffer, 256);
       mvwaddwstr(win, y, x, wide_buffer);

@@ -3,6 +3,7 @@
 #endif
 
 #include "utils.h"
+#include "database.h"
 #include "platform_utils.h"
 #include <ctype.h>
 #include <errno.h>
@@ -129,7 +130,7 @@ void truncate_by_width(char *dest, size_t dest_size, const char *src,
   free(w_src);
 }
 
-int getDatabasePath(char *buffer, size_t buffer_size) {
+int obterCaminhoBancoDeDados(char *buffer, size_t buffer_size) {
   char *app_path = platform_get_config_dir();
   if (!app_path) {
     fprintf(stderr, "Error: Could not get the configuration directory.\n");
@@ -145,7 +146,7 @@ int getDatabasePath(char *buffer, size_t buffer_size) {
   }
 
 
-  char *db_path = path_join(app_path, DATABASE_NAME);
+  char *db_path = path_join(app_path, NOME_BANCO_DE_DADOS);
   free(app_path);
 
   if (!db_path) {
@@ -265,7 +266,7 @@ char *path_join(const char *base, const char *leaf) {
 
     const char separator =
 #ifdef _WIN32
-        '\';
+        '\\';
 #else
         '/';
 #endif
@@ -289,4 +290,39 @@ char *path_join(const char *base, const char *leaf) {
     safe_memcpy(result + base_len + 1, leaf, leaf_len + 1); // +1 to copy the null
 
     return result;
+}
+
+int safe_snprintf(char *str, size_t size, const char *format, ...) {
+    if (size == 0) return -1; // Error: zero size buffer
+
+    va_list args;
+    va_start(args, format);
+    int ret = vsnprintf(str, size, format, args);
+    va_end(args);
+
+    if (ret < 0) {
+        // Encoding error
+        str[0] = '\0';
+        return -1;
+    }
+    if ((size_t)ret >= size) {
+        // Truncation occurred
+        str[size - 1] = '\0';
+        return (int)(size - 1);
+    }
+    return ret;
+}
+
+void *safe_memcpy(void *dest, const void *src, size_t n) {
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+    return memcpy(dest, src, n);
+}
+
+void *safe_memmove(void *dest, const void *src, size_t n) {
+    if (dest == NULL || src == NULL) {
+        return NULL;
+    }
+    return memmove(dest, src, n);
 }

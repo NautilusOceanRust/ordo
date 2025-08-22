@@ -24,7 +24,7 @@ bool app_init(AppState *app) {
   theme_load_external();
 
   char db_path[MAX_PATH];
-  if (getDatabasePath(db_path, sizeof(db_path))) {
+  if (obterCaminhoBancoDeDados(db_path, sizeof(db_path))) {
     return false;
   }
 

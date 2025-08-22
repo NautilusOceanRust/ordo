@@ -10,6 +10,8 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
+#define DATABASE_NAME "ordo.db"
+
 #include "error.h"
 #include "task.h"
 #include "task_list.h"

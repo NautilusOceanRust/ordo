@@ -1,3 +1,4 @@
+#include "utils.h"
 #include "config.h"
 #include "platform_utils.h" // Include the new module
 #include "theme.h"

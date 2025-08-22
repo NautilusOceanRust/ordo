@@ -96,7 +96,7 @@ static void handle_main_view_input(AppState *app, int choice) {
     if (task_id != -1) {
       if (ui_confirm_action("CONFIRM_TRASH_PROMPT", "MENU_REMOVE",
                             &app->config)) {
-        Tarefa *task = &app->task_list.tasks[app->current_selection];
+        Task *task = &app->task_list.tasks[app->current_selection];
         undo_manager_push(&app->undo_manager, ACTION_DELETE, task_id,
                           task->descricao, NULL, task->concluida);
         result = database_remove_task(&app->db, task_id);
@@ -142,7 +142,7 @@ static void handle_main_view_input(AppState *app, int choice) {
     if (task_id != -1) {
       if (ui_confirm_action("CONFIRM_TOGGLE_PROMPT", "MENU_TOGGLE",
                             &app->config)) {
-        Tarefa *task = &app->task_list.tasks[app->current_selection];
+        Task *task = &app->task_list.tasks[app->current_selection];
         undo_manager_push(&app->undo_manager, ACTION_TOGGLE, task_id, NULL,
                           NULL, task->concluida);
         result =

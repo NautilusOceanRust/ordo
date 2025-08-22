@@ -227,13 +227,13 @@ This tool allows you to import tasks from a JSON or plain text file.
 
 The second argument to the importer is the path to the database file. This path varies by operating system.
 
-*   **Linux:** `~/.local/share/ordo/tasks.db`
-*   **macOS:** `~/.local/share/ordo/tasks.db`
+*   **Linux:** `~/.config/ordo/tasks.db`
+*   **macOS:** `~/.config/ordo/tasks.db`
 *   **Windows:** `%LOCALAPPDATA%\ordo\tasks.db` (e.g., `C:\Users\YourUser\AppData\Local\ordo\tasks.db`)
 
 ```bash
 # Example on Linux/macOS
-./build/ordo-importer tasks.json ~/.local/share/ordo/tasks.db
+./build/ordo-importer tasks.json ~/.config/ordo/tasks.db
 
 # Example on Windows (Command Prompt)
 .\build\ordo-importer.exe tasks.json %LOCALAPPDATA%\ordo\tasks.db
@@ -273,9 +273,9 @@ Ordo stores its configuration files, database, and themes in standard user direc
 | OS      | Path                                       | Description                                |
 | :------ | :----------------------------------------- | :----------------------------------------- |
 | Linux   | `~/.config/ordo/`                          | Config (`config.ini`) and themes (`.theme`) |
-|         | `~/.local/share/ordo/`                     | Database (`tasks.db`)                      |
+|         | `~/.config/ordo/`                          | Database (`tasks.db`)                      |
 | macOS   | `~/.config/ordo/`                          | Config (`config.ini`) and themes (`.theme`) |
-|         | `~/.local/share/ordo/`                     | Database (`tasks.db`)                      |
+|         | `~/.config/ordo/`                          | Database (`tasks.db`)                      |
 | Windows | `%APPDATA%\ordo\`                          | Config (`config.ini`) and themes (`.theme`) |
 |         | `%LOCALAPPDATA%\ordo\`                     | Database (`tasks.db`)                      |
 

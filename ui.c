@@ -1,4 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
+#include "utils.h"
 #include "ui.h"
 #include "i18n.h"
 #include "utils.h"
@@ -85,7 +86,7 @@ void ui_display_menu(WINDOW *win, const AppConfig *config,
       if ((size_t)len >= sizeof(str_buffer)) {
         // Handle error
       }
-      truncar_por_largura(truncated_buffer, sizeof(truncated_buffer),
+      truncate_by_width(truncated_buffer, sizeof(truncated_buffer),
                           str_buffer, SIDEBAR_WIDTH - 4);
       mbstowcs(wide_buffer, truncated_buffer, 256);
       mvwaddwstr(win, 4 + i, 2, wide_buffer);
@@ -100,7 +101,7 @@ void ui_display_menu(WINDOW *win, const AppConfig *config,
       if ((size_t)len >= sizeof(str_buffer)) {
         // Handle error
       }
-      truncar_por_largura(truncated_buffer, sizeof(truncated_buffer),
+      truncate_by_width(truncated_buffer, sizeof(truncated_buffer),
                           str_buffer, SIDEBAR_WIDTH - 4);
       mbstowcs(wide_buffer, truncated_buffer, 256);
       mvwaddwstr(win, 4 + i, 2, wide_buffer);
@@ -110,7 +111,7 @@ void ui_display_menu(WINDOW *win, const AppConfig *config,
   wnoutrefresh(win);
 }
 
-void ui_display_tasks(WINDOW *win, const Tarefa *tasks, int num_tasks,
+void ui_display_tasks(WINDOW *win, const Task *tasks, int num_tasks,
                       const AppConfig *config, int scroll_offset,
                       int current_selection, AppView current_view) {
   
@@ -155,7 +156,7 @@ void ui_display_tasks(WINDOW *win, const Tarefa *tasks, int num_tasks,
       safe_snprintf(task_line, sizeof(task_line), " %s %s", status_icon,
                tasks[task_index].descricao);
       char truncated_line[win_w];
-      truncar_por_largura(truncated_line, sizeof(truncated_line), task_line,
+      truncate_by_width(truncated_line, sizeof(truncated_line), task_line,
                           win_w - 4);
       wchar_t wide_task[win_w];
       mbstowcs(wide_task, truncated_line, win_w);
@@ -468,7 +469,7 @@ bool ui_confirm_action(const char *translation_key, const char *title_key,
   return (choice == 'y' || choice == 'Y' || choice == 's' || choice == 'S');
 }
 
-void ui_display_full_task(const Tarefa *task, const AppConfig *config) {
+void ui_display_full_task(const Task *task, const AppConfig *config) {
   (void)config;
   int win_h = 15, win_w = 70;
   WINDOW *win = create_popup(win_h, win_w, "VIEW_TITLE");
@@ -493,7 +494,7 @@ void ui_display_full_task(const Tarefa *task, const AppConfig *config) {
   } else {
     // Fallback to the old behavior if allocation fails
     char truncated_desc[MAX_DESCRICAO];
-    truncar_por_largura(truncated_desc, sizeof(truncated_desc), task->descricao,
+    truncate_by_width(truncated_desc, sizeof(truncated_desc), task->descricao,
                         max_width);
     mvwprintw(win, 8, 2, "%s", truncated_desc);
   }
