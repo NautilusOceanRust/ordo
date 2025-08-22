@@ -7,6 +7,7 @@
 #include "platform_utils.h"
 #include <ctype.h>
 #include <errno.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -266,7 +267,7 @@ char *path_join(const char *base, const char *leaf) {
 
     const char separator =
 #ifdef _WIN32
-        '\\';
+        '\';
 #else
         '/';
 #endif
@@ -293,23 +294,26 @@ char *path_join(const char *base, const char *leaf) {
 }
 
 int safe_snprintf(char *str, size_t size, const char *format, ...) {
-    if (size == 0) return -1; // Error: zero size buffer
+    if (str == NULL || size == 0 || format == NULL) {
+        return -1;
+    }
 
     va_list args;
     va_start(args, format);
-    int ret = vsnprintf(str, size, format, args);
+    int ret = vsnprintf(str, size, format, args); // NOLINT
     va_end(args);
 
     if (ret < 0) {
-        // Encoding error
-        str[0] = '\0';
+        // Encoding error or other error from vsnprintf
+        str[0] = '\0'; // Ensure null-termination on error
         return -1;
     }
+
     if ((size_t)ret >= size) {
-        // Truncation occurred
-        str[size - 1] = '\0';
+        // Truncation occurred. The buffer is full, but null-terminated.
         return (int)(size - 1);
     }
+
     return ret;
 }
 
@@ -317,12 +321,13 @@ void *safe_memcpy(void *dest, const void *src, size_t n) {
     if (dest == NULL || src == NULL) {
         return NULL;
     }
-    return memcpy(dest, src, n);
+    return memcpy(dest, src, n); // NOLINT
 }
 
 void *safe_memmove(void *dest, const void *src, size_t n) {
     if (dest == NULL || src == NULL) {
         return NULL;
     }
-    return memmove(dest, src, n);
+    return memmove(dest, src, n); // NOLINT
 }
+
