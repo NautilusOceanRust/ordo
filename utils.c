@@ -267,7 +267,7 @@ char *path_join(const char *base, const char *leaf) {
 
     const char separator =
 #ifdef _WIN32
-        '\';
+        '\\';
 #else
         '/';
 #endif

@@ -26,7 +26,7 @@ static void apply_theme_preview(const OrdoTheme *theme, const AppConfig *config)
 }
 
 static WINDOW *draw_theme_preview_window(int starty, int startx,
-                                         const OrdoTheme *theme, const AppConfig *config) {
+                                         const AppConfig *config) {
   if (startx + 40 > COLS)
     startx = COLS - 40;
   if (starty + 10 > LINES)
@@ -40,45 +40,43 @@ static WINDOW *draw_theme_preview_window(int starty, int startx,
   wbkgd(win, COLOR_PAIR(config->color_pair_header));
   box(win, 0, 0);
 
-  wchar_t wide_buffer[256];
-  char str_buffer[256];
-  char truncated_buffer[256];
+  // --- Sidebar Preview ---
+  WINDOW *sidebar_preview = derwin(win, 8, 18, 1, 1);
+  wbkgd(sidebar_preview, COLOR_PAIR(config->color_pair_header));
+  box(sidebar_preview, 0, 0);
+  wattron(sidebar_preview, COLOR_PAIR(config->color_pair_header));
+  mvwprintw(sidebar_preview, 1, 2, "Ordo");
+  wattroff(sidebar_preview, COLOR_PAIR(config->color_pair_header));
+  mvwprintw(sidebar_preview, 3, 1, "[1] Add Task");
+  mvwprintw(sidebar_preview, 4, 1, "[2] To Trash");
+  mvwprintw(sidebar_preview, 5, 1, "[t] View Trash");
+  wnoutrefresh(sidebar_preview);
+  delwin(sidebar_preview);
 
-  safe_snprintf(str_buffer, sizeof(str_buffer), "%s: %s",
-           get_translation("THEME_PREVIEW"), theme->name);
-  truncate_by_width(truncated_buffer, sizeof(truncated_buffer), str_buffer,
-                      38);
-  mbstowcs(wide_buffer, truncated_buffer, 256);
-  mvwaddwstr(win, 1, 2, wide_buffer);
+  // --- Content Preview ---
+  WINDOW *content_preview = derwin(win, 8, 20, 1, 19);
+  box(content_preview, 0, 0);
+  wattron(content_preview, COLOR_PAIR(config->color_pair_header));
+  mvwprintw(content_preview, 0, 2, " Tasks ");
+  wattroff(content_preview, COLOR_PAIR(config->color_pair_header));
 
-  wattron(win, COLOR_PAIR(config->color_pair_header));
-  mbstowcs(wide_buffer, get_translation("HEADER_TEXT"), 256);
-  mvwaddwstr(win, 3, 4, wide_buffer);
-  wattroff(win, COLOR_PAIR(config->color_pair_header));
+  wattron(content_preview, COLOR_PAIR(config->color_pair_task_done));
+  mvwprintw(content_preview, 2, 2, "[x] Done task");
+  wattroff(content_preview, COLOR_PAIR(config->color_pair_task_done));
 
-  wattron(win, COLOR_PAIR(config->color_pair_task_done));
-  safe_snprintf(str_buffer, sizeof(str_buffer), "[x] %s",
-           get_translation("DONE_TASK"));
-  mbstowcs(wide_buffer, str_buffer, 256);
-  mvwaddwstr(win, 4, 4, wide_buffer);
-  wattroff(win, COLOR_PAIR(config->color_pair_task_done));
+  wattron(content_preview, COLOR_PAIR(config->color_pair_task_pending));
+  mvwprintw(content_preview, 3, 2, "[ ] Pending task");
+  wattroff(content_preview, COLOR_PAIR(config->color_pair_task_pending));
+  wnoutrefresh(content_preview);
+  delwin(content_preview);
 
-  wattron(win, COLOR_PAIR(config->color_pair_task_pending));
-  safe_snprintf(str_buffer, sizeof(str_buffer), "[ ] %s",
-           get_translation("PENDING_TASK"));
-  mbstowcs(wide_buffer, str_buffer, 256);
-  mvwaddwstr(win, 5, 4, wide_buffer);
-  wattroff(win, COLOR_PAIR(config->color_pair_task_pending));
-
-  wattron(win, COLOR_PAIR(config->color_pair_success));
-  mbstowcs(wide_buffer, get_translation("SUCCESS_MESSAGE"), 256);
-  mvwaddwstr(win, 6, 4, wide_buffer);
-  wattroff(win, COLOR_PAIR(config->color_pair_success));
-
-  wattron(win, COLOR_PAIR(config->color_pair_error));
-  mbstowcs(wide_buffer, get_translation("ERROR_MESSAGE"), 256);
-  mvwaddwstr(win, 7, 4, wide_buffer);
-  wattroff(win, COLOR_PAIR(config->color_pair_error));
+  // --- Status Bar Preview ---
+  WINDOW *status_preview = derwin(win, 1, 38, 8, 1);
+  wattron(status_preview, COLOR_PAIR(config->color_pair_success));
+  mvwprintw(status_preview, 0, 1, "Success message!");
+  wattroff(status_preview, COLOR_PAIR(config->color_pair_success));
+  wnoutrefresh(status_preview);
+  delwin(status_preview);
 
   wnoutrefresh(win);
   return win;
@@ -143,7 +141,7 @@ static void ui_settings_select_theme(AppConfig *config) {
     apply_theme_preview(preview_theme, config);
     wnoutrefresh(stdscr);
     preview_win = draw_theme_preview_window(
-        list_start_y, list_start_x + max_name_len + 5, preview_theme, config);
+        list_start_y, list_start_x + max_name_len + 5, config);
     doupdate();
 
     int choice = getch();
