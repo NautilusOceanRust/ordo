@@ -92,17 +92,59 @@ The easiest way to install dependencies on macOS is using [Homebrew](https://bre
 brew install meson ninja sqlite ncurses cjson
 ```
 
-#### 🪟 Windows
+#### 🪟 Windows (with MSYS2)
 
-For Windows, we recommend using the **MSYS2** environment to set up the required toolchain.
+For Windows, we recommend using the **MSYS2** environment, which provides a powerful Unix-like shell and access to a wide range of development tools.
 
-1.  **[Install MSYS2](https://www.msys2.org/)** and open the MSYS2 MinGW 64-bit terminal.
-2.  Install the toolchain and dependencies using `pacman`:
+##### 1. Install MSYS2
+
+First, **[install MSYS2](https://www.msys2.org/)**. Once installed, you will have access to several different shell environments. The environment you choose determines the architecture and C runtime library you will build for.
+
+##### 2. Choose Your Environment
+
+Open the appropriate MSYS2 terminal for your desired build target. Each environment has its own set of packages and toolchains.
+
+| Environment         | Shell Startup Shortcut      | Target Architecture | C Runtime  | Toolchain Prefix                |
+| :------------------ | :-------------------------- | :------------------ | :--------- | :------------------------------ |
+| **MinGW x64**       | `MinGW 64-bit`              | `x86_64`            | `MSVCRT`   | `mingw-w64-x86_64-`             |
+| **MinGW x86**       | `MinGW 32-bit`              | `i686`              | `MSVCRT`   | `mingw-w64-i686-`               |
+| **UCRT x64**        | `UCRT 64-bit`               | `x86_64`            | `UCRT`     | `mingw-w64-ucrt-x86_64-`        |
+| **Clang x64**       | `Clang 64-bit`              | `x86_64`            | `UCRT`     | `mingw-w64-clang-x86_64-`       |
+
+- **MinGW x64 (Recommended for most users):** Creates standard 64-bit Windows executables. It uses the older, but highly compatible, `MSVCRT` C runtime library that is included in all versions of Windows.
+- **MinGW x86:** Creates 32-bit executables.
+- **UCRT x64:** Uses the newer Universal C Runtime (`UCRT`), which is standard in Windows 10/11 and can be installed on older versions. It offers better compatibility with modern C standards.
+- **Clang x64:** Similar to UCRT x64 but uses the Clang compiler instead of GCC.
+
+##### 3. Install Dependencies
+
+In the MSYS2 terminal you chose, install the required dependencies. The package names are prefixed according to the environment.
+
+-   **For MinGW x64 (GCC):**
     ```bash
     pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-meson mingw-w64-x86_64-ninja \
                 mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-pdcurses mingw-w64-x86_64-cjson
     ```
-    *Note: On Windows, `pdcurses` is used as the replacement for `ncurses`.*
+
+-   **For MinGW x86 (32-bit):**
+    ```bash
+    pacman -S mingw-w64-i686-gcc mingw-w64-i686-meson mingw-w64-i686-ninja \
+                mingw-w64-i686-sqlite3 mingw-w64-i686-pdcurses mingw-w64-i686-cjson
+    ```
+
+-   **For UCRT x64 (GCC with UCRT runtime):**
+    ```bash
+    pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-meson mingw-w64-ucrt-x86_64-ninja \
+                mingw-w64-ucrt-x86_64-sqlite3 mingw-w64-ucrt-x86_64-pdcurses mingw-w64-ucrt-x86_64-cjson
+    ```
+
+-   **For Clang x64 (Clang with UCRT runtime):**
+    ```bash
+    pacman -S mingw-w64-clang-x86_64-clang mingw-w64-clang-x86_64-meson mingw-w64-clang-x86_64-ninja \
+                mingw-w64-clang-x86_64-sqlite3 mingw-w64-clang-x86_64-pdcurses mingw-w64-clang-x86_64-cjson
+    ```
+
+*Note: On Windows, `pdcurses` is used as the replacement for `ncurses`.*
 
 
 ### 2. Compile the Project
