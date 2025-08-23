@@ -149,14 +149,33 @@ In the MSYS2 terminal you chose, install the required dependencies. The package 
 
 ### 2. Compile the Project
 
-Once the dependencies are installed, the compilation steps are the same for all platforms:
+Once the dependencies are installed, you can easily compile the project using the provided `build.sh` script. This script handles the configuration and compilation for all platforms.
+
+On Windows, you must run this script from within an MSYS2 terminal (e.g., MinGW 64-bit). The script will automatically detect the environment and create a corresponding build directory (e.g., `build-mingw64`).
 
 ```bash
-# 1. Configure the build directory (e.g., 'build')
-meson setup build
+# Make the script executable (on Linux and macOS)
+chmod +x build.sh
 
-# 2. Compile the project using Ninja
-ninja -C build
+# Configure and compile the project
+./build.sh
+```
+
+The script accepts the following commands:
+
+| Command       | Description                                           |
+| :------------ | :---------------------------------------------------- |
+| `all`         | (Default) Configures and compiles the project.        |
+| `build`       | Compiles the project.                                 |
+| `configure`   | Configures the project using Meson.                   |
+| `test`        | Runs the unit tests.                                  |
+| `clean`       | Removes all build directories.                        |
+| `help`        | Shows the help message.                               |
+
+For example, to clean all build files, you would run:
+
+```bash
+./build.sh clean
 ```
 
 #### Compiling with Clang/LLVM

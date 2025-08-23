@@ -1,1 +1,2 @@
 option('tests', type : 'boolean', value : false, description : 'Enable unit tests.')
+option('msys2_env', type : 'combo', choices : ['auto', 'mingw64', 'mingw32', 'ucrt64', 'clang64'], value : 'auto', description : 'MSYS2 environment to build for.')
