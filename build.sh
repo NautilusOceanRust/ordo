@@ -34,6 +34,43 @@ case "$MSYSTEM" in
     ;;
 esac
 
+# --- Dependency Check ---
+function check_dependencies() {
+    echo "Checking MSYS2 dependencies..."
+    
+    local prefix
+    case "$MSYSTEM" in
+        MINGW64) prefix="mingw-w64-x86_64-" ;;
+        MINGW32) prefix="mingw-w64-i686-" ;;
+        UCRT64)  prefix="mingw-w64-ucrt-x86_64-" ;;
+        CLANG64) prefix="mingw-w64-clang-x86_64-" ;;
+    esac
+
+    local deps=("gcc" "meson" "ninja" "sqlite3" "pdcurses" "cjson")
+    local missing_deps=()
+
+    for dep in "${deps[@]}"; do
+        local pkg_name="${prefix}${dep}"
+        if ! pacman -Q "$pkg_name" &>/dev/null; then
+            missing_deps+=("$pkg_name")
+        fi
+    done
+
+    if [ ${#missing_deps[@]} -gt 0 ]; then
+        echo "Error: The following required packages are missing:"
+        for pkg in "${missing_deps[@]}"; do
+            echo "  - $pkg"
+        done
+        echo
+        echo "Please install them by running:"
+        echo "  pacman -S ${missing_deps[*]}"
+        echo
+        exit 1
+    fi
+
+    echo "All dependencies are satisfied. ✨"
+}
+
 # --- Functions ---
 
 # Function to display help
@@ -75,6 +112,11 @@ function clean() {
 
 # --- Main Logic ---
 COMMAND="$1"
+
+# Always check dependencies unless cleaning or asking for help
+if [[ "$COMMAND" != "clean" && "$COMMAND" != "help" ]]; then
+    check_dependencies
+fi
 
 if [ -z "$COMMAND" ]; then
   COMMAND="all"

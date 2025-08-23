@@ -15,13 +15,54 @@ echo   help         Shows this help message.
 echo.
 goto:eof
 
+REM --- MSYS2 Dependency Check ---
+:check_dependencies
+echo Checking MSYS2 dependencies...
+set "PREFIX="
+if /i "%MSYSTEM%"=="MINGW64" set "PREFIX=mingw-w64-x86_64-"
+if /i "%MSYSTEM%"=="MINGW32" set "PREFIX=mingw-w64-i686-"
+if /i "%MSYSTEM%"=="UCRT64"  set "PREFIX=mingw-w64-ucrt-x86_64-"
+if /i "%MSYSTEM%"=="CLANG64" set "PREFIX=mingw-w64-clang-x86_64-"
+
+if not defined PREFIX (
+    echo Warning: Unsupported MSYSTEM '%MSYSTEM%'. Skipping dependency check.
+    goto:eof
+)
+
+set "DEPS=gcc meson ninja sqlite3 pdcurses cjson"
+set "MISSING_DEPS="
+
+for %%d in (%DEPS%) do (
+    pacman -Q "%PREFIX%%%d" >nul 2>&1
+    if errorlevel 1 (
+        set "MISSING_DEPS=!MISSING_DEPS! %PREFIX%%%d"
+    )
+)
+
+if defined MISSING_DEPS (
+    echo Error: The following required packages are missing:
+    for %%p in (%MISSING_DEPS%) do (
+        echo   - %%p
+    )
+    echo.
+    echo Please install them by running:
+    echo   pacman -S%MISSING_DEPS%
+    echo.
+    exit /b 1
+)
+
+echo All dependencies are satisfied. ✨
+goto:eof
+
+
 REM --- Environment Detection ---
 set "MSYS2_ENV="
 if defined MSYSTEM (
     set "MSYSTEM_LOWER=%MSYSTEM%"
-    REM Batch file does not have a built-in lowercase function, but MSYSTEM is usually consistent.
-    REM We will use it as is, e.g., MINGW64, UCRT64.
     set "MSYS2_ENV=%MSYSTEM_LOWER%"
+) else (
+    echo Error: This script is intended to be run in an MSYS2 environment.
+    exit /b 1
 )
 
 REM --- Build Directory ---
@@ -70,6 +111,14 @@ goto:eof
 REM --- Main Logic ---
 set "COMMAND=%1"
 if not defined COMMAND set "COMMAND=all"
+
+setlocal enabledelayedexpansion
+
+REM Check dependencies for relevant commands
+if /i not "%COMMAND%"=="clean" if /i not "%COMMAND%"=="help" (
+    call:check_dependencies
+    if errorlevel 1 exit /b 1
+)
 
 if /i "%COMMAND%"=="help" (
     call:show_help
