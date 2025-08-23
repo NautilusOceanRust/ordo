@@ -60,6 +60,17 @@ Ordo is designed with a modular architecture to separate concerns and make the c
 -   **`utils.c` / `utils.h`**: Contains utility functions used throughout the project.
 -   **`platform_utils.c` / `platform_utils.h`**: Provides platform-specific functionalities, such as finding configuration directories.
 
+## 📜 C23 Standard
+
+This project is built using the **C23 standard**. This allows us to use modern C features for a more robust and clean codebase.
+
+To compile Ordo, you will need a compiler that supports C23:
+
+-   **GCC**: Version **12** or newer.
+-   **Clang**: Version **15** or newer.
+
+Please ensure your development environment meets these requirements.
+
 ## 🛠️ How to Compile
 
 Ordo uses the **Meson** build system with **Ninja** and can be compiled on Linux, macOS, and Windows.

@@ -1,6 +1,6 @@
 project('ordo', 'c',
   version : '0.1.0',
-  default_options : ['c_std=c11', 'warning_level=2', 'b_gdb=true'])
+  default_options : ['c_std=c23', 'warning_level=2', 'b_gdb=true'])
 
 # --- Extra Compiler Arguments ---
 add_project_arguments('-pedantic', language: 'c')
@@ -19,7 +19,7 @@ endif
 
 # --- Dependencies ---
 sqlite3_dep = dependency('sqlite3', required: true)
-cjson_dep = dependency('cjson', required: true, fallback: ['libcjson', 'cjson_dep'])
+cjson_dep = dependency('libcjson', required: true, fallback: ['libcjson', 'cjson_dep'])
 
 if host_machine.system() == 'windows'
   # On Windows, we use pdcurses instead of ncurses
