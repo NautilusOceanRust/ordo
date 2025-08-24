@@ -31,12 +31,12 @@ A: The project was written with portability in mind, using code that adapts to t
 A: The `ordo-importer` is a command-line tool for bulk importing tasks from a JSON file into the Ordo database. The JSON file must be an array of objects, where each object has a `description` (string) and a `completed` (boolean) field.
 
 *   **Usage:** `./build/ordo-importer <input_file.json> <path_to_db>`
-*   **Example:** `./build/ordo-importer my_tasks.json ~/.config/ordo/tasks.db`
+*   **Example:** `./build/ordo-importer my_tasks.json ~/.config/ordo/ordo.db`
 
 **Q: Where are the configuration and data files located?**
 
 A: The location depends on your operating system, but on Linux, they are typically found in:
-*   **Configuration and Database:** The `config.ini` and `tasks.db` files are located in `~/.config/ordo/`.
+*   **Configuration and Database:** The `config.ini` and `ordo.db` files are located in `~/.config/ordo/`.
 *   **Themes and Languages:** Custom themes and language files can be placed in `~/.config/ordo/themes/` and `~/.config/ordo/langs/` respectively.
 
 **Q: How do I create a new color theme?**
@@ -67,7 +67,7 @@ A: This is usually a terminal configuration issue, not an Ordo issue. Ordo uses 
 
 **Q: What is the database schema?**
 
-A: The database is a simple SQLite file (`tasks.db`) with a single main table named `tasks`. The schema is as follows:
+A: The database is a simple SQLite file (`ordo.db`) with a single main table named `tasks`. The schema is as follows:
 ```sql
 CREATE TABLE tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -299,16 +299,16 @@ This tool allows you to import tasks from a JSON or plain text file.
 
 The second argument to the importer is the path to the database file. This path varies by operating system.
 
-*   **Linux:** `~/.config/ordo/tasks.db`
-*   **macOS:** `~/.config/ordo/tasks.db`
-*   **Windows:** `%LOCALAPPDATA%\ordo\tasks.db` (e.g., `C:\Users\YourUser\AppData\Local\ordo\tasks.db`)
+*   **Linux:** `~/.config/ordo/ordo.db`
+*   **macOS:** `~/.config/ordo/ordo.db`
+*   **Windows:** `%LOCALAPPDATA%\ordo\ordo.db` (e.g., `C:\Users\YourUser\AppData\Local\ordo\ordo.db`)
 
 ```bash
 # Example on Linux/macOS
-./build/ordo-importer tasks.json ~/.config/ordo/tasks.db
+./build/ordo-importer tasks.json ~/.config/ordo/ordo.db
 
 # Example on Windows (Command Prompt)
-.\build\ordo-importer.exe tasks.json %LOCALAPPDATA%\ordo\tasks.db
+.\build\ordo-importer.exe tasks.json %LOCALAPPDATA%\ordo\ordo.db
 ```
 
 ## 🕹️ How to Use
@@ -345,11 +345,11 @@ Ordo stores its configuration files, database, and themes in standard user direc
 | OS      | Path                                       | Description                                |
 | :------ | :----------------------------------------- | :----------------------------------------- |
 | Linux   | `~/.config/ordo/`                          | Config (`config.ini`) and themes (`.theme`) |
-|         | `~/.config/ordo/`                          | Database (`tasks.db`)                      |
+|         | `~/.config/ordo/`                          | Database (`ordo.db`)                      |
 | macOS   | `~/.config/ordo/`                          | Config (`config.ini`) and themes (`.theme`) |
-|         | `~/.config/ordo/`                          | Database (`tasks.db`)                      |
+|         | `~/.config/ordo/`                          | Database (`ordo.db`)                      |
 | Windows | `%APPDATA%\ordo\`                          | Config (`config.ini`) and themes (`.theme`) |
-|         | `%LOCALAPPDATA%\ordo\`                     | Database (`tasks.db`)                      |
+|         | `%LOCALAPPDATA%\ordo\`                     | Database (`ordo.db`)                      |
 
 *   On Windows, `%APPDATA%` typically resolves to `C:\Users\<YourUser>\AppData\Roaming`.
 *   On Windows, `%LOCALAPPDATA%` typically resolves to `C:\Users\<YourUser>\AppData\Local`.
