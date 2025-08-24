@@ -253,7 +253,7 @@ This will create two executables in the `build/` directory:
 
 ### 3. Application Icon
 
-The Windows build is configured to use the `ordo.ico` file as the application icon. The provided `ordo.ico` is a placeholder. To use your own icon, simply replace `ordo.ico` with your desired `.ico` file.
+The Windows build is configured to use the `ordo.ico` file as the application icon.
 
 ### Troubleshooting
 

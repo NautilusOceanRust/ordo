@@ -1,5 +1,5 @@
-#!/bin/sh
-# Script to run clang-tidy on all C sources in the project.
+#!/bin/bash
+# Bash Script to run clang-tidy on all C sources in the project.
 # It uses the compilation database to get the list of files and compiler flags.
 
 set -e # Exit immediately if a command exits with a non-zero status.

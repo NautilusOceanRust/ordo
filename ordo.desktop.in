@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Ordo
+Comment=Your Tasks, Your Terminal, Your Way
+Exec=@bindir@/ordo
+Icon=ordo
+Categories=Utility;
+Terminal=true

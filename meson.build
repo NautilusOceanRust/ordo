@@ -147,3 +147,29 @@ if doxygen_prog.found()
   )
 endif
 
+# --- Desktop Entry and Icon Installation ---
+if host_machine.system() != 'windows'
+  # Desktop Entry
+  conf_data = configuration_data()
+  conf_data.set('bindir', join_paths(get_option('prefix'), get_option('bindir')))
+  
+  desktop_file = configure_file(
+    input: 'ordo.desktop.in',
+    output: 'ordo.desktop',
+    configuration: conf_data
+  )
+
+  install_data(
+    desktop_file,
+    install_dir: get_option('datadir') / 'applications'
+  )
+
+  # Icon Installation
+  foreach size : ['16x16', '32x32', '48x48', '256x256']
+    install_data(
+      'icons/ordo-' + size + '.png',
+      install_dir: get_option('datadir') / 'icons/hicolor' / size / 'apps',
+      rename: 'ordo.png'
+    )
+  endforeach
+endif
