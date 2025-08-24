@@ -18,14 +18,13 @@ static inline void auto_free(void *p) {
 
 // --- Utility Function Declarations ---
 
-#define NOME_APLICACAO "ordo"
-#define NOME_BANCO_DE_DADOS "tasks.db"
+#define APPLICATION_NAME "ordo"
 #define MAX_PATH 4096
 
 // String and path manipulation functions
 void truncate_by_width(char *dest, size_t dest_size, const char *src,
 			 int max_width);
-int obterCaminhoBancoDeDados(char *buffer, size_t tamanho_buffer);
+int get_database_path(char *buffer, size_t buffer_size);
 char *trim(const char *str);
 char *word_wrap(const char *src, int max_width);
 char *path_join(const char *base, const char *leaf);

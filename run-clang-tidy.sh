@@ -5,17 +5,30 @@
 set -e # Exit immediately if a command exits with a non-zero status.
 
 PROJECT_ROOT=$(pwd)
-BUILD_DIR="build"
+BUILD_DIR=${1:-build} # Use the first argument as BUILD_DIR, or default to "build"
+
+if [ -z "$BUILD_DIR" ]; then
+    echo "Usage: $0 <build-directory>"
+    exit 1
+fi
+
 COMPILE_DB="$BUILD_DIR/compile_commands.json"
+
+if [ ! -d "$BUILD_DIR" ]; then
+    echo "Error: Build directory '$BUILD_DIR' not found."
+    echo "Please run the build first."
+    exit 1
+fi
 
 if [ ! -f "$COMPILE_DB" ]; then
     echo "Error: Compilation database not found at $COMPILE_DB"
-    echo "Please run 'meson setup build' first."
+    echo "Please run 'meson setup' in '$BUILD_DIR' first."
     exit 1
 fi
 
 # Change into the build directory so that the relative paths in the
 # compilation database are resolved correctly by clang-tidy.
+echo "Running clang-tidy in $BUILD_DIR..."
 cd "$BUILD_DIR"
 
 # Extract file paths from the compilation database.

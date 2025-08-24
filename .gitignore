@@ -2,3 +2,4 @@
 /build/
 *.d
 git-commit.sh
+/releases/

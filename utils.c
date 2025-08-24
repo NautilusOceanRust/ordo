@@ -15,8 +15,7 @@
 #include <wctype.h>
 
 #ifdef _WIN32
-#include <shlobj.h>
-#include <windows.h>
+// No specific includes needed here for now
 #else
 #include <sys/stat.h>
 #include <unistd.h>
@@ -131,7 +130,7 @@ void truncate_by_width(char *dest, size_t dest_size, const char *src,
   free(w_src);
 }
 
-int obterCaminhoBancoDeDados(char *buffer, size_t buffer_size) {
+int get_database_path(char *buffer, size_t buffer_size) {
   char *app_path = platform_get_config_dir();
   if (!app_path) {
     fprintf(stderr, "Error: Could not get the configuration directory.\n");
@@ -147,7 +146,7 @@ int obterCaminhoBancoDeDados(char *buffer, size_t buffer_size) {
   }
 
 
-  char *db_path = path_join(app_path, NOME_BANCO_DE_DADOS);
+  char *db_path = path_join(app_path, DATABASE_NAME);
   free(app_path);
 
   if (!db_path) {

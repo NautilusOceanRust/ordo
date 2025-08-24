@@ -1,6 +1,6 @@
 project('ordo', 'c',
   version : '0.1.0',
-  default_options : ['c_std=c23', 'warning_level=2', 'b_gdb=true'])
+  default_options : ['c_std=c2x', 'warning_level=2', 'b_gdb=true'])
 
 # --- Extra Compiler Arguments ---
 add_project_arguments('-pedantic', language: 'c')
@@ -22,13 +22,22 @@ sqlite3_dep = dependency('sqlite3', required: true)
 cjson_dep = dependency('libcjson', required: true, fallback: ['libcjson', 'cjson_dep'])
 
 if host_machine.system() == 'windows'
-  # On Windows, we use pdcurses instead of ncurses
-  ncursesw_dep = dependency('pdcurses', required: true, fallback: ['pdcurses', 'pdcurses_dep'])
+  # On Windows, we use pdcurses which provides 'curses.h'
+  ncursesw_dep = dependency('pdcurses', required: true)
+
+  # Create a compatibility header 'ncurses.h' that includes 'curses.h'
+  # to avoid changing the source code.
+  ncurses_compat_dir = include_directories(meson.current_build_dir())
+  configure_file(
+    output: 'ncurses.h',
+    content: '#include <curses.h>'
+  )
   if msys2_env != ''
     message('Building for MSYS2 environment: ' + msys2_env)
   endif
 else
   ncursesw_dep = dependency('ncursesw', required: true)
+  ncurses_compat_dir = [] # No compatibility directory needed
 endif
 
 # --- Main Executable ---
@@ -50,6 +59,7 @@ sources = [
 
 executable('ordo', sources,
   dependencies : [sqlite3_dep, ncursesw_dep, cjson_dep],
+  include_directories: ncurses_compat_dir,
   install : true)
 
 # --- Importer Tool ---

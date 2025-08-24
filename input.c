@@ -265,7 +265,16 @@ void input_handle(AppState *app, int key) {
     return;
   }
   if (key == KEY_RESIZE) {
-    // The layout will be redrawn in the next loop, no action needed here
+#ifdef _WIN32
+    // PDCurses handles resizing differently.
+    // A KEY_RESIZE event is sent, and we just need to call resize_term.
+    resize_term(0, 0);
+#else
+    // For ncurses, we check if the size has actually changed
+    // before redrawing everything.
+    resizeterm(LINES, COLS);
+#endif
+    app->refresh_tasks = true; // Force a redraw
     return;
   }
   if (key == KEY_MOUSE) {

@@ -14,30 +14,29 @@
 #else
 #include <dirent.h>
 #include <unistd.h>
-#include <wordexp.h>
 #endif
 
 // --- Implementation for POSIX (Linux, macOS) ---
 #ifndef _WIN32
 
-char *platform_get_config_dir(void) {
-  const char *config_home = getenv("XDG_CONFIG_HOME");
+// Helper function for POSIX systems to get XDG base directories
+static char *get_xdg_path(const char *env_var, const char *fallback_path) {
+  const char *env_val = getenv(env_var);
   char *base_path = NULL;
 
-  if (config_home && config_home[0]) {
-    base_path = strdup(config_home);
+  if (env_val && env_val[0]) {
+    base_path = strdup(env_val);
   } else {
-    wordexp_t exp_result;
-    if (wordexp("~/.config", &exp_result, 0) == 0) {
-      base_path = strdup(exp_result.we_wordv[0]);
-      wordfree(&exp_result);
-    } else {
-      return NULL; // Failed to expand the path
+    const char *home_dir = getenv("HOME");
+    if (!home_dir) {
+      return NULL; // Cannot determine home directory
     }
+    base_path = path_join(home_dir, fallback_path);
   }
 
-  if (!base_path)
+  if (!base_path) {
     return NULL;
+  }
 
   char *ordo_path = path_join(base_path, "ordo");
   free(base_path);
@@ -45,29 +44,12 @@ char *platform_get_config_dir(void) {
   return ordo_path;
 }
 
+char *platform_get_config_dir(void) {
+  return get_xdg_path("XDG_CONFIG_HOME", ".config");
+}
+
 char *platform_get_data_dir(void) {
-  const char *data_home = getenv("XDG_DATA_HOME");
-  char *base_path = NULL;
-
-  if (data_home && data_home[0]) {
-    base_path = strdup(data_home);
-  } else {
-    wordexp_t exp_result;
-    if (wordexp("~/.local/share", &exp_result, 0) == 0) {
-      base_path = strdup(exp_result.we_wordv[0]);
-      wordfree(&exp_result);
-    } else {
-      return NULL; // Failed to expand the path
-    }
-  }
-
-  if (!base_path)
-    return NULL;
-
-  char *ordo_path = path_join(base_path, "ordo");
-  free(base_path);
-
-  return ordo_path;
+  return get_xdg_path("XDG_DATA_HOME", ".local/share");
 }
 
 bool platform_create_dir_recursive(const char *path) {
@@ -135,8 +117,8 @@ char *platform_get_config_dir(void) {
   char path[MAX_PATH];
   // CSIDL_APPDATA corresponds to %APPDATA%
   if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_APPDATA, NULL, 0, path))) {
-    strcat_s(path, MAX_PATH, "\\ordo");
-    return strdup(path);
+    char *ordo_path = path_join(path, "ordo");
+    return ordo_path;
   }
   return NULL;
 }
