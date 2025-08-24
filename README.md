@@ -131,11 +131,12 @@ Open the appropriate MSYS2 terminal for your desired build target. Each environm
 
 In the MSYS2 terminal you chose, install the required dependencies. The package names are prefixed according to the environment.
 
--   **For MinGW x64 (GCC):**
+-   **For MinGW x64 (GCC):
     ```bash
-    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-meson mingw-w64-x86_64-ninja \
+    pacman -S --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-meson mingw-w64-x86_64-ninja \
                 mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-pdcurses mingw-w64-x86_64-cjson
     ```
+
 
 -   **For MinGW x86 (32-bit):**
     ```bash
@@ -160,17 +161,21 @@ In the MSYS2 terminal you chose, install the required dependencies. The package 
 
 ### 2. Compile the Project
 
-Once the dependencies are installed, you can easily compile the project using the provided `build.sh` script. This script handles the configuration and compilation for all platforms.
+Once the dependencies are installed, you can easily compile the project using the provided build scripts.
 
-On Windows, you must run this script from within an MSYS2 terminal (e.g., MinGW 64-bit). The script will automatically detect the environment and create a corresponding build directory (e.g., `build-mingw64`).
-
-```bash
-# Make the script executable (on Linux and macOS)
-chmod +x build.sh
-
-# Configure and compile the project
-./build.sh
-```
+*   **On Linux and macOS:**
+    ```bash
+    chmod +x build.sh
+    ./build.sh
+    ```
+*   **On Windows (from an MSYS2 terminal):**
+    ```bash
+    ./build.sh
+    ```
+    Or, for convenience, you can run the `build.bat` script from a regular Command Prompt or PowerShell, which will automatically call the `build.sh` script in the correct MSYS2 environment.
+    ```batch
+    build.bat
+    ```
 
 The script accepts the following commands:
 
@@ -245,6 +250,17 @@ It is also possible to build a fully native Windows executable using Clang in MS
 This will create two executables in the `build/` directory:
 *   `ordo` (or `ordo.exe` on Windows): The main program.
 *   `ordo-importer` (or `ordo-importer.exe` on Windows): A tool to import tasks from a JSON or plain text file into the Ordo database.
+
+### 3. Application Icon
+
+The Windows build is configured to use the `ordo.ico` file as the application icon. The provided `ordo.ico` is a placeholder. To use your own icon, simply replace `ordo.ico` with your desired `.ico` file.
+
+### Troubleshooting
+
+*   **`command not found: meson` or `command not found: ninja`:**
+    This means that Meson or Ninja is not in your system's PATH. Make sure you have installed them correctly and that the installation directory is in your PATH. On Windows, make sure you are running the commands from within the correct MSYS2 terminal where you installed the dependencies.
+*   **`fatal error: curses.h: No such file or directory`:**
+    This means that the `ncurses` (or `pdcurses` on Windows) development library is not installed. Please install it using your system's package manager.
 
 ## 💻 Development with VS Code
 ```

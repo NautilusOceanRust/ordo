@@ -9,9 +9,14 @@ add_project_arguments('-DPROJECT_SOURCE_ROOT="@0@"'.format(meson.project_source_
 # --- MSYS2 Environment Detection ---
 msys2_env = get_option('msys2_env')
 if msys2_env == 'auto'
-  res = run_command('sh', '-c', 'echo $MSYSTEM')
-  if res.returncode() == 0
-    msys2_env = res.stdout().strip().to_lower()
+  sh_prog = find_program('sh', required: false)
+  if sh_prog.found()
+    res = run_command(sh_prog, '-c', 'echo $MSYSTEM')
+    if res.returncode() == 0
+      msys2_env = res.stdout().strip().to_lower()
+    else
+      msys2_env = ''
+    endif
   else
     msys2_env = ''
   endif
@@ -57,10 +62,17 @@ sources = [
   'input.c'
 ]
 
-executable('ordo', sources,
-  dependencies : [sqlite3_dep, ncursesw_dep, cjson_dep],
-  include_directories: ncurses_compat_dir,
-  install : true)
+ordo_exe_args = {
+  'dependencies': [sqlite3_dep, ncursesw_dep, cjson_dep],
+  'include_directories': ncurses_compat_dir,
+  'install': true
+}
+
+if host_machine.system() == 'windows'
+  ordo_exe_args += {'win_resources': compile_resources('ordo.rc')}
+endif
+
+executable('ordo', sources, kwargs: ordo_exe_args)
 
 # --- Importer Tool ---
 executable('ordo-importer', 'ordo-importer.c',

@@ -3,3 +3,4 @@
 *.d
 git-commit.sh
 /releases/
+release-compress.sh
